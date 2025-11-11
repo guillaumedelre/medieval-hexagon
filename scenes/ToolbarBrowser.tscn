@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://dyr17vsxj6a00"]
+
+[ext_resource type="Script" uid="uid://dt4ob7cxtpcgo" path="res://scripts/toolbar_browser.gd" id="1_un1da"]
+
+[node name="ToolbarBrowser" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_un1da")
+
+[node name="ModelList" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(480, 320)
+layout_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ModelList"]
+layout_mode = 2

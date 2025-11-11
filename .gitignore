@@ -1,0 +1,24 @@
+# Fichiers générés par Godot
+.import/
+.export/
+.cache/
+.editor_settings-3.tres
+.editor_settings-4.tres
+*.import
+*.translation
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Scripts UID (recréés automatiquement)
+*.gd.uid
+
+# Backups automatiques de Godot
+*.tmp
+*.backup
+*.old
+
+# Si tu as un build exporté
+build/
+export/
