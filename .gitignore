@@ -6,6 +6,7 @@
 .editor_settings-4.tres
 *.import
 *.translation
+.godot/
 
 # Fichiers système
 .DS_Store

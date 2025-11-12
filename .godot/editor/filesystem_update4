@@ -1,9 +1,0 @@
-res://scenes/MapEditor.tscn
-res://scenes/HexGrid.tscn
-res://scenes/ModelPreview.tscn
-res://scenes/GhostTile.tscn
-res://scenes/HexTile.tscn
-res://scripts/hex_grid.gd
-res://scripts/preview_viewport.gd
-res://scenes/ToolbarBrowser.tscn
-res://scripts/toolbar_browser.gd
