@@ -25,7 +25,7 @@ func get_model_path() -> String:
 func _load_model(path: String) -> void:
 	var scene: PackedScene = load(path)
 	if scene == null:
-		push_error("⚠️ Impossible de charger : %s" % path)
+		push_error("️ Impossible de charger : %s" % path)
 		return
 	for c in get_children():
 		if c is Node3D:

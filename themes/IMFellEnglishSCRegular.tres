@@ -1,0 +1,6 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://roaardyrrykv"]
+
+[ext_resource type="FontFile" uid="uid://dwcywqgwut513" path="res://fonts/IMFellEnglishSC-Regular.ttf" id="1_o52lp"]
+
+[resource]
+base_font = ExtResource("1_o52lp")

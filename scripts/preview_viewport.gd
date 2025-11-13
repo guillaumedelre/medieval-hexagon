@@ -12,7 +12,7 @@ class_name ModelPreview
 @export var rotation_speed: float = 15.0
 
 @onready var viewport: SubViewport = $SubViewportContainer/SubViewport
-@onready var holder: Node3D = $SubViewportContainer/SubViewport/holder
+@onready var holder: Node3D = $SubViewportContainer/SubViewport/Holder
 @onready var label: Label = $Label
 
 var model_instance: Node3D = null
@@ -40,7 +40,7 @@ func _load_model(path: String) -> void:
 
 	var scene: PackedScene = load(path)
 	if scene == null:
-		push_error("❌ Impossible de charger : %s" % path)
+		push_error(" Impossible de charger : %s" % path)
 		return
 
 	var inst: Node3D = scene.instantiate() as Node3D

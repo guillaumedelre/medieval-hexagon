@@ -1,13 +1,18 @@
 extends Node3D
+
 class_name HexGrid
+
 @export var radius: int = 30
 @export var tile_size: float = 1.0
 @export var hover_color: Color = Color(1, 1, 0, 0.5)
 @export var base_color: Color = Color(0.6, 0.6, 0.6, 0.1)
+
 var tiles: Dictionary = {}
 var hovered_key: String = ""
+
 func _ready() -> void:
 	_generate_grid()
+
 func _generate_grid() -> void:
 	# --- Génération de la grille visible ---
 	for q in range(-radius, radius + 1):
@@ -20,7 +25,7 @@ func _generate_grid() -> void:
 				add_child(mi)
 				tiles["%s:%s" % [q, r]] = mi
 
-	# --- ✅ Plan de collision invisible ---
+	# ---  Plan de collision invisible ---
 	# Permet au raycast de détecter le sol même sans tuiles posées.
 	var body: StaticBody3D = StaticBody3D.new()
 	body.name = "GroundCollider"
@@ -32,6 +37,7 @@ func _generate_grid() -> void:
 
 	body.add_child(shape)
 	add_child(body)
+
 func _create_hex_mesh() -> ArrayMesh:
 	var local_radius: float = tile_size * 0.5
 	var points: PackedVector3Array = PackedVector3Array()
@@ -44,6 +50,7 @@ func _create_hex_mesh() -> ArrayMesh:
 	for p in points:
 		st.add_vertex(p)
 	return st.commit()
+
 func _make_material(color: Color) -> StandardMaterial3D:
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.albedo_color = color
@@ -51,10 +58,12 @@ func _make_material(color: Color) -> StandardMaterial3D:
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.vertex_color_use_as_albedo = true
 	return mat
+
 func _axial_to_world(q: int, r: int) -> Vector3:
 	var x: float = tile_size * sqrt(3.0) * (float(q) + float(r) / 2.0)
 	var z: float = tile_size * 1.5 * float(r)
 	return Vector3(x, 0.02, z)
+
 func highlight(q: int, r: int) -> void:
 	var key: String = "%s:%s" % [q, r]
 	if q == -999 and r == -999:

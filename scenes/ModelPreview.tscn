@@ -1,29 +1,33 @@
-[gd_scene load_steps=2 format=3 uid="uid://b3xccynio75cf"]
+[gd_scene load_steps=3 format=3 uid="uid://b3xccynio75cf"]
 
 [ext_resource type="Script" uid="uid://dv2qmwmv8e3ub" path="res://scripts/preview_viewport.gd" id="1_sxtel"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_sxtel"]
+font_size = 12
+
 [node name="ModelPreview" type="Control"]
-custom_minimum_size = Vector2(140, 170)
+custom_minimum_size = Vector2(200, 150)
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_sxtel")
 model_path = "res://addons/kaykit_medieval_hexagon_pack/Assets/gltf/tiles/base/hex_grass.gltf"
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+clip_contents = true
 custom_minimum_size = Vector2(200, 150)
 layout_mode = 0
-offset_right = 256.0
-offset_bottom = 256.0
+offset_right = 200.0
+offset_bottom = 200.0
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 own_world_3d = true
 transparent_bg = true
 handle_input_locally = false
-size = Vector2i(256, 256)
+size = Vector2i(200, 200)
 render_target_update_mode = 4
 
-[node name="holder" type="Node3D" parent="SubViewportContainer/SubViewport"]
+[node name="Holder" type="Node3D" parent="SubViewportContainer/SubViewport"]
 
 [node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport"]
 transform = Transform3D(0.7071068, -0.29883626, 0.6408564, 0, 0.9063078, 0.42261827, -0.7071068, -0.29883626, 0.6408564, 4, 3, 4)
@@ -36,10 +40,13 @@ transform = Transform3D(0.8660254, -0.43301272, 0.25, 0, 0.49999997, 0.86602545,
 light_energy = 6.0
 
 [node name="Label" type="Label" parent="."]
-layout_mode = 0
-offset_top = 142.0
-offset_right = 140.0
-offset_bottom = 170.0
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "hex_grass"
+label_settings = SubResource("LabelSettings_sxtel")
 horizontal_alignment = 1
 vertical_alignment = 2
 clip_text = true
