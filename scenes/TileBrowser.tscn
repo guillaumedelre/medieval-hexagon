@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://cp32jgyyj222g"]
+
+[ext_resource type="Script" uid="uid://cygh6p8vxmes8" path="res://scripts/tile_browser.gd" id="1"]
+
+[node name="TileBrowser" type="Control"]
+anchor_right = 0.25
+anchor_bottom = 0.6
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+script = ExtResource("1")
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_type_variation = &"Panel"
+
+[node name="Scroll" type="ScrollContainer" parent="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 8.0
+margin_top = 8.0
+margin_right = -8.0
+margin_bottom = -8.0
+scroll_horizontal_enabled = false
+
+[node name="Grid" type="GridContainer" parent="Panel/Scroll"]
+columns = 2

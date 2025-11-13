@@ -1,12 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://bmvl0mmvq2xrt"]
+[gd_scene load_steps=7 format=3 uid="uid://bmvl0mmvq2xrt"]
 
 [ext_resource type="Script" uid="uid://ggdqf2dgh24r" path="res://scripts/terrain_generator.gd" id="1_bwris"]
 [ext_resource type="Script" uid="uid://bhfxbci4dpeyx" path="res://scripts/camera_controller.gd" id="2_rwdrj"]
-[ext_resource type="Script" uid="uid://dt4ob7cxtpcgo" path="res://scripts/toolbar_browser.gd" id="3_go5ny"]
-[ext_resource type="Script" uid="uid://bwr2dtr05y1dy" path="res://scripts/ui/top_bar.gd" id="4_2jvji"]
+[ext_resource type="Script" uid="uid://bwr2dtr05y1dy" path="res://scripts/top_bar.gd" id="4_2jvji"]
 [ext_resource type="Environment" uid="uid://dj268r1axdpa0" path="res://default_env.tres" id="4_rwdrj"]
 [ext_resource type="FontFile" uid="uid://c81ebf4wibc8j" path="res://fonts/Font Awesome 7 Sharp-Regular-400.otf" id="5_2jvji"]
-[ext_resource type="PackedScene" uid="uid://bgohvbpqyr56c" path="res://scenes/MenuManager.tscn" id="7_fxgqh"]
+[ext_resource type="PackedScene" uid="uid://cp32jgyyj222g" path="res://scenes/TileBrowser.tscn" id="7_y6um0"]
 
 [node name="MapEditor" type="Node3D" groups=["terrain_generator"]]
 script = ExtResource("1_bwris")
@@ -68,36 +67,5 @@ theme_override_fonts/font = ExtResource("5_2jvji")
 [node name="LabelFPS" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 
-[node name="ToolbarBrowser" type="PanelContainer" parent="UI"]
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -20.0
-offset_right = 40.0
-offset_bottom = 20.0
-grow_vertical = 2
-script = ExtResource("3_go5ny")
-
-[node name="ModelList" type="ScrollContainer" parent="UI/ToolbarBrowser"]
-custom_minimum_size = Vector2(480, 320)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/ToolbarBrowser/ModelList"]
-layout_mode = 2
-
-[node name="Minimap" type="PanelContainer" parent="UI"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -40.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="MenuManager" parent="UI" instance=ExtResource("7_fxgqh")]
-layout_mode = 1
+[node name="TileBrowser" parent="UI" instance=ExtResource("7_y6um0")]
+anchors_preset = 0
