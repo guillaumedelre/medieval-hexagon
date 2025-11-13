@@ -1,77 +1,51 @@
 extends Node3D
 class_name GhostTile
 
-@export var model_path: String = ""
 @onready var holder: Node3D = $Holder
 
-# Matériaux mémorisés pour réutiliser la même teinte
-var mat_ok: StandardMaterial3D
-var mat_blocked: StandardMaterial3D
-var can_place: bool = true
-
+var model_path: String = ""
+var mesh_ok: StandardMaterial3D
+var mesh_blocked: StandardMaterial3D
 
 func _ready() -> void:
-	# Matériaux verts / rouges semi-transparents
-	mat_ok = StandardMaterial3D.new()
-	mat_ok.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat_ok.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat_ok.albedo_color = Color(0.4, 1.0, 0.4, 0.4)
+	mesh_ok = StandardMaterial3D.new()
+	mesh_ok.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh_ok.albedo_color = Color(0, 1, 0, 0.35)
 
-	mat_blocked = StandardMaterial3D.new()
-	mat_blocked.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat_blocked.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat_blocked.albedo_color = Color(1.0, 0.3, 0.3, 0.4)
+	mesh_blocked = StandardMaterial3D.new()
+	mesh_blocked.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh_blocked.albedo_color = Color(1, 0, 0, 0.35)
+
+
+func clear() -> void:
+	for c in holder.get_children():
+		c.queue_free()
+	model_path = ""
 
 
 func set_model(path: String) -> void:
-	if path == model_path and holder.get_child_count() > 0:
+	if path == model_path:
 		return
-
+	clear()
 	model_path = path
-	for c in holder.get_children():
-		c.queue_free()
-
-	if path == "":
-		return
 
 	var scene: PackedScene = load(path)
-	if scene == null:
-		push_warning("⚠️ Modèle introuvable : %s" % path)
+	if not scene:
 		return
 
 	var inst: Node3D = scene.instantiate()
-	_make_transparent(inst)
 	holder.add_child(inst)
+	_apply_material(inst, mesh_ok)
 
 
-func _make_transparent(n: Node) -> void:
-	if n is MeshInstance3D:
-		var mesh := n as MeshInstance3D
-		# copie du matériel original pour garder la texture mais ajouter transparence
-		var base_mat: BaseMaterial3D
-		if mesh.material_override and mesh.material_override is BaseMaterial3D:
-			base_mat = mesh.material_override.duplicate() as BaseMaterial3D
-		else:
-			base_mat = StandardMaterial3D.new()
-
-		base_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		base_mat.albedo_color.a = 0.4
-		base_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mesh.material_override = base_mat
-
-	for child in n.get_children():
-		_make_transparent(child)
+func set_valid_state(is_ok: bool) -> void:
+	var mat = mesh_ok if is_ok else mesh_blocked
+	for c in holder.get_children():
+		_apply_material(c, mat)
 
 
-# ✅ Change la teinte du modèle selon s’il est plaçable ou non
-func set_valid_state(value: bool) -> void:
-	can_place = value
-	var tint_mat := mat_ok if can_place else mat_blocked
-	_apply_tint(holder, tint_mat)
-
-
-func _apply_tint(n: Node, tint: StandardMaterial3D) -> void:
-	if n is MeshInstance3D:
-		(n as MeshInstance3D).material_override = tint
-	for child in n.get_children():
-		_apply_tint(child, tint)
+func _apply_material(node: Node, mat: Material) -> void:
+	if node is MeshInstance3D:
+		node.material_override = mat
+	for child in node.get_children():
+		_apply_material(child, mat)

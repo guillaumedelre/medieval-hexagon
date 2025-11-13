@@ -1,12 +1,178 @@
 extends Node3D
+class_name MapEditor
 
-@onready var tile_browser: Control = $UI/TileBrowser
-@onready var terrain: Node = self
+@onready var tile_browser: TileBrowser = $UI/TileBrowser
+@onready var layer_selector: LayerSelector = $UI/LayerSelector
+@onready var hex_grid: HexGrid = $HexGrid
+@onready var ghost_tile: GhostTile = $GhostTile
+@onready var camera: Camera3D = $CameraPivot/Camera3D
+
+@onready var terrain_layer: Node3D = $Layers/TerrainLayer
+@onready var building_layer: Node3D = $Layers/BuildingLayer
+@onready var resource_layer: Node3D = $Layers/ResourceLayer
+
+var current_layer: Node3D
+var current_layer_name: String = "terrain"
+var current_model_path: String = ""
+var math: HexMath
+var tiles: Dictionary = {} # clé: layer:q:r
+
 
 func _ready() -> void:
-	if tile_browser and terrain.has_method("_on_model_selected"):
-		if not tile_browser.is_connected("model_selected", Callable(terrain, "_on_model_selected")):
-			tile_browser.model_selected.connect(Callable(terrain, "_on_model_selected"))
-			print("✅ MapEditor prêt — signal du TileBrowser connecté.")
-	else:
-		push_warning("⚠️ Impossible de connecter TileBrowser → _on_model_selected().")
+	current_layer = terrain_layer
+	math = preload("res://scripts/hex_math.gd").new()
+
+	if tile_browser and not tile_browser.is_connected("model_selected", Callable(self, "_on_model_selected")):
+		tile_browser.model_selected.connect(Callable(self, "_on_model_selected"))
+
+	if layer_selector and not layer_selector.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
+		layer_selector.layer_changed.connect(Callable(self, "_on_layer_changed"))
+
+	print("✅ MapEditor prêt.")
+
+
+func _physics_process(_delta: float) -> void:
+	_update_highlight()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+
+		# Empêcher les clics pendant que la souris est sur l’UI
+		if get_viewport().gui_get_hovered_control() != null:
+			return
+
+		match event.button_index:
+			MOUSE_BUTTON_LEFT:	_place_tile_from_mouse()
+			MOUSE_BUTTON_RIGHT:	_remove_tile_from_mouse()
+
+
+func _on_layer_changed(layer_name: String) -> void:
+	current_layer_name = layer_name
+
+	match layer_name:
+		"terrain":	
+			current_layer = terrain_layer
+			tile_browser.set_filter("tiles")
+		"building":	
+			current_layer = building_layer
+			tile_browser.set_filter("buildings")
+		"resource":	
+			current_layer = resource_layer
+			tile_browser.set_filter("decoration")
+		_:
+			push_warning("⚠️ Layer inconnu : %s" % layer_name)
+
+	print("📌 Layer actif :", current_layer_name)
+
+
+func _on_model_selected(path: String) -> void:
+	current_model_path = path
+	print("🎯 Modèle actif :", path)
+
+	if ghost_tile:
+		ghost_tile.visible = true
+		ghost_tile.set_model(path)
+
+
+# -------------------------------------------------------
+# 🔥 Correction complète du RAYCAST
+# -------------------------------------------------------
+func _raycast_from_mouse() -> Dictionary:
+	var mouse := get_viewport().get_mouse_position()
+	var origin := camera.project_ray_origin(mouse)
+	var dir := camera.project_ray_normal(mouse)
+	var space := get_world_3d().direct_space_state
+
+	var params := PhysicsRayQueryParameters3D.create(origin, origin + dir * 2000.0)
+
+	# 🔥 Ajout 1 : détecter toutes les collisions
+	params.collide_with_areas = true
+	params.collide_with_bodies = true
+
+	# 🔥 Ajout 2 : raycast stable même si la caméra touche un collider
+	params.hit_from_inside = true
+
+	# 🔥 Ajout 3 : tout layer
+	params.collision_mask = 0xFFFFFFFF
+
+	return space.intersect_ray(params)
+
+
+func _update_highlight() -> void:
+	var result := _raycast_from_mouse()
+
+	if result.is_empty():
+		hex_grid.highlight(-999, -999)
+		if ghost_tile: ghost_tile.visible = false
+		return
+
+	var hit_pos : Vector3 = result.position
+	var axial := math.world_to_axial(hit_pos)
+	var q := int(axial.x)
+	var r := int(axial.y)
+
+	hex_grid.highlight(q, r)
+	var world_pos := math.axial_to_world(q, r)
+
+	# Ghost
+	if ghost_tile:
+		ghost_tile.visible = current_model_path != ""
+		ghost_tile.global_position = world_pos
+
+		var key := _make_key(current_layer_name, q, r)
+		var occupied := tiles.has(key)
+		ghost_tile.set_valid_state(not occupied)
+
+
+func _place_tile_from_mouse() -> void:
+	if current_model_path == "":
+		print("⚠️ Aucun modèle sélectionné.")
+		return
+
+	var hit := _raycast_from_mouse()
+	if hit.is_empty(): return
+	
+	var axial := math.world_to_axial(hit.position)
+	var q := int(axial.x)
+	var r := int(axial.y)
+
+	var key := _make_key(current_layer_name, q, r)
+	if tiles.has(key):
+		print("🚫 Tuile déjà occupée :", key)
+		return
+
+	var scene: PackedScene = load(current_model_path)
+	if scene == null:
+		push_warning("⚠️ Impossible de charger :", current_model_path)
+		return
+
+	var inst: Node3D = scene.instantiate()
+	inst.position = math.axial_to_world(q, r)
+	current_layer.add_child(inst)
+	tiles[key] = inst
+
+	print("✅ Objet placé sur", current_layer_name, "à", key)
+
+
+func _remove_tile_from_mouse() -> void:
+	var hit := _raycast_from_mouse()
+	if hit.is_empty(): return
+
+	var axial := math.world_to_axial(hit.position)
+	var q := int(axial.x)
+	var r := int(axial.y)
+
+	var key := _make_key(current_layer_name, q, r)
+	if not tiles.has(key):
+		print("ℹ️ Rien à supprimer :", key)
+		return
+
+	tiles[key].queue_free()
+	tiles.erase(key)
+
+	print("🗑️ Supprimé :", key)
+
+
+func _make_key(layer_name: String, q: int, r: int) -> String:
+	return "%s:%d:%d" % [layer_name, q, r]

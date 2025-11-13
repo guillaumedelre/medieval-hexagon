@@ -3,10 +3,12 @@ extends HBoxContainer
 @onready var label_camera: Label = $LabelCamera
 @onready var label_tile: Label = $LabelTile
 @onready var label_height: Label = $LabelHeight
+@onready var label_layer: Label = $LabelLayer
 @onready var label_fps: Label = $LabelFPS
 @onready var label_camera_icon: Label = $LabelCameraIcon
 @onready var label_tile_icon: Label = $LabelTileIcon
 @onready var label_height_icon: Label = $LabelHeightIcon
+@onready var label_layer_icon: Label = $LabelLayerIcon
 @onready var label_fps_icon: Label = $LabelFPSIcon
 
 var camera: Camera3D = null
