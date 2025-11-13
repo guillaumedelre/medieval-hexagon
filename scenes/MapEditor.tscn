@@ -29,6 +29,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="TopBar" type="HBoxContainer" parent="UI"]
 custom_minimum_size = Vector2(0, 28)
@@ -67,7 +68,7 @@ theme_override_fonts/font = ExtResource("5_2jvji")
 [node name="LabelFPS" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 
-[node name="ToolbarPanel" type="PanelContainer" parent="UI"]
+[node name="ToolbarBrowser" type="PanelContainer" parent="UI"]
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
@@ -76,17 +77,13 @@ offset_top = -20.0
 offset_right = 40.0
 offset_bottom = 20.0
 grow_vertical = 2
-
-[node name="ToolbarBrowser" type="Control" parent="UI/ToolbarPanel"]
-layout_mode = 2
-size_flags_horizontal = 0
 script = ExtResource("3_go5ny")
 
-[node name="ModelList" type="ScrollContainer" parent="UI/ToolbarPanel/ToolbarBrowser"]
+[node name="ModelList" type="ScrollContainer" parent="UI/ToolbarBrowser"]
 custom_minimum_size = Vector2(480, 320)
-layout_mode = 0
+layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/ToolbarPanel/ToolbarBrowser/ModelList"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ToolbarBrowser/ModelList"]
 layout_mode = 2
 
 [node name="Minimap" type="PanelContainer" parent="UI"]

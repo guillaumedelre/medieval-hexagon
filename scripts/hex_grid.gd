@@ -1,5 +1,4 @@
 extends Node3D
-
 class_name HexGrid
 
 @export var radius: int = 30
@@ -13,57 +12,88 @@ var hovered_key: String = ""
 func _ready() -> void:
 	_generate_grid()
 
+
+# ---------------------------------------------------------------------
+# Génère la grille hexagonale visible + un large plan de collision
+# ---------------------------------------------------------------------
 func _generate_grid() -> void:
-	# --- Génération de la grille visible ---
+	# --- Génération visuelle des hexagones ---
 	for q in range(-radius, radius + 1):
 		for r in range(-radius, radius + 1):
 			if abs(q + r) <= radius:
-				var mi: MeshInstance3D = MeshInstance3D.new()
+				var mi := MeshInstance3D.new()
 				mi.mesh = _create_hex_mesh()
 				mi.material_override = _make_material(base_color)
 				mi.position = _axial_to_world(q, r)
 				add_child(mi)
 				tiles["%s:%s" % [q, r]] = mi
 
-	# ---  Plan de collision invisible ---
-	# Permet au raycast de détecter le sol même sans tuiles posées.
-	var body: StaticBody3D = StaticBody3D.new()
+	# --- Plan de collision invisible ---
+	var body := StaticBody3D.new()
 	body.name = "GroundCollider"
 
-	var shape: CollisionShape3D = CollisionShape3D.new()
-	var box: BoxShape3D = BoxShape3D.new()
-	box.size = Vector3(radius * tile_size * 3.0, 0.1, radius * tile_size * 3.0)
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+
+	# Largeur/hauteur du plan : on couvre plus large que la grille
+	var size_x := radius * tile_size * 3.5
+	var size_z := radius * tile_size * 3.5
+	box.size = Vector3(size_x, 0.1, size_z)
 	shape.shape = box
 
+	# Le plan est légèrement sous les tuiles
+	shape.position = Vector3(0, -0.05, 0)
 	body.add_child(shape)
+
+	# Placement du collider au centre global de la grille
+	body.position = Vector3(0, 0, 0)
+	body.collision_layer = 1
+	body.collision_mask = 1
+
 	add_child(body)
 
+
+# ---------------------------------------------------------------------
+# Génération d’un hexagone filaire simple
+# ---------------------------------------------------------------------
 func _create_hex_mesh() -> ArrayMesh:
 	var local_radius: float = tile_size * 0.5
-	var points: PackedVector3Array = PackedVector3Array()
+	var points := PackedVector3Array()
 	for i in range(6):
 		var angle: float = deg_to_rad(60.0 * float(i))
 		points.append(Vector3(local_radius * cos(angle), 0.0, local_radius * sin(angle)))
 	points.append(points[0])
-	var st: SurfaceTool = SurfaceTool.new()
+	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_LINE_STRIP)
 	for p in points:
 		st.add_vertex(p)
 	return st.commit()
 
+
+# ---------------------------------------------------------------------
+# Matériaux
+# ---------------------------------------------------------------------
 func _make_material(color: Color) -> StandardMaterial3D:
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	var mat := StandardMaterial3D.new()
 	mat.albedo_color = color
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.vertex_color_use_as_albedo = true
 	return mat
 
+
+# ---------------------------------------------------------------------
+# Conversion coord. hex -> monde
+# ---------------------------------------------------------------------
 func _axial_to_world(q: int, r: int) -> Vector3:
 	var x: float = tile_size * sqrt(3.0) * (float(q) + float(r) / 2.0)
 	var z: float = tile_size * 1.5 * float(r)
-	return Vector3(x, 0.02, z)
+	return Vector3(x, 0.02, z)  # très léger offset Y pour éviter le z-fighting
 
+
+# ---------------------------------------------------------------------
+# Survol visuel
+# ---------------------------------------------------------------------
 func highlight(q: int, r: int) -> void:
 	var key: String = "%s:%s" % [q, r]
 	if q == -999 and r == -999:
@@ -72,11 +102,14 @@ func highlight(q: int, r: int) -> void:
 			prev.material_override.albedo_color = base_color
 		hovered_key = ""
 		return
+
 	if hovered_key == key:
 		return
+
 	if tiles.has(hovered_key):
 		var old: MeshInstance3D = tiles[hovered_key]
 		old.material_override.albedo_color = base_color
+
 	if tiles.has(key):
 		var cur: MeshInstance3D = tiles[key]
 		cur.material_override.albedo_color = hover_color
