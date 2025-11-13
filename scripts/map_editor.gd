@@ -62,6 +62,14 @@ func _on_layer_changed(layer_name: String) -> void:
 			tile_browser.set_filter("decoration")
 		_:
 			push_warning("⚠️ Layer inconnu : %s" % layer_name)
+			
+	# 🔥 Réinitialisation du modèle actif et du ghost
+	current_model_path = ""
+	print("🔄 Changement de layer → modèle réinitialisé.")
+
+	if ghost_tile:
+		ghost_tile.visible = false
+		ghost_tile.set_model("")
 
 	print("📌 Layer actif :", current_layer_name)
 
