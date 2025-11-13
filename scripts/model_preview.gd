@@ -20,8 +20,9 @@ class_name ModelPreview
 @onready var viewport: SubViewport = $SubViewportContainer/SubViewport
 @onready var holder: Node3D = $SubViewportContainer/SubViewport/Holder
 
-var model_instance: Node3D = null
+const PREVIEW_SCALE: float = 1    # ↙️ 3x plus petit (0.3 = 30%)
 
+var model_instance: Node3D = null
 
 func _ready() -> void:
 	if not model_path.is_empty() and model_instance == null:
@@ -60,7 +61,7 @@ func _load_model(path: String) -> void:
 		inst.position = -center
 
 		var max_dim: float = maxf(aabb.size.x, maxf(aabb.size.y, aabb.size.z))
-		var scale_factor: float = 2.5 / max_dim
+		var scale_factor: float = (2.5 / max_dim) * PREVIEW_SCALE
 		inst.scale = Vector3.ONE * scale_factor
 
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS

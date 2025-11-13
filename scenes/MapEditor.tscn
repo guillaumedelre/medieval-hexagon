@@ -92,62 +92,46 @@ layout_mode = 2
 [node name="LayerSelector" type="Control" parent="UI"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
+anchor_top = 0.582
 anchor_right = 1.0
-anchor_bottom = 0.5
+anchor_bottom = 0.63100004
+offset_left = 2.0
+offset_top = 140.86398
+offset_right = 2.0
+offset_bottom = 141.11197
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("8_cio15")
 
-[node name="TerrainButton" type="Button" parent="UI/LayerSelector"]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -207.0
-offset_top = -14.5
-offset_right = -168.0
-offset_bottom = 14.5
-grow_horizontal = 0
-grow_vertical = 2
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/LayerSelector"]
+layout_mode = 0
+offset_top = -9.0
+offset_right = 201.0
+offset_bottom = 31.0
+
+[node name="TerrainButton" type="Button" parent="UI/LayerSelector/HBoxContainer"]
+layout_mode = 2
 text = "Base"
 
-[node name="BuildingButton" type="Button" parent="UI/LayerSelector"]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -161.0
-offset_top = -14.5
-offset_right = -86.0
-offset_bottom = 14.5
-grow_horizontal = 0
-grow_vertical = 2
+[node name="BuildingButton" type="Button" parent="UI/LayerSelector/HBoxContainer"]
+layout_mode = 2
 text = "Buildings"
 
-[node name="ResourceButton" type="Button" parent="UI/LayerSelector"]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -79.0
-offset_top = -14.5
-offset_bottom = 14.5
-grow_horizontal = 0
-grow_vertical = 2
+[node name="ResourceButton" type="Button" parent="UI/LayerSelector/HBoxContainer"]
+layout_mode = 2
 text = "Resources"
 
 [node name="TileBrowser" parent="UI" instance=ExtResource("7_y6um0")]
 layout_mode = 1
+anchor_top = 0.84700006
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.14398193
+offset_right = 0.0
+offset_bottom = 0.0
 grow_vertical = 2
 
-[connection signal="pressed" from="UI/LayerSelector/TerrainButton" to="UI/LayerSelector" method="_on_TerrainButton_pressed"]
-[connection signal="pressed" from="UI/LayerSelector/BuildingButton" to="UI/LayerSelector" method="_on_BuildingButton_pressed"]
-[connection signal="pressed" from="UI/LayerSelector/ResourceButton" to="UI/LayerSelector" method="_on_ResourceButton_pressed"]
+[connection signal="pressed" from="UI/LayerSelector/HBoxContainer/TerrainButton" to="UI/LayerSelector" method="_on_TerrainButton_pressed"]
+[connection signal="pressed" from="UI/LayerSelector/HBoxContainer/BuildingButton" to="UI/LayerSelector" method="_on_BuildingButton_pressed"]
+[connection signal="pressed" from="UI/LayerSelector/HBoxContainer/ResourceButton" to="UI/LayerSelector" method="_on_ResourceButton_pressed"]
