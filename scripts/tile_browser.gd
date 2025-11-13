@@ -11,11 +11,8 @@ const PREVIEW_SIZE: Vector2 = Vector2(180, 180)
 var models: Array[String] = []
 var filter_folder: String = ""   # sous-dossier actif
 
-
 func _ready() -> void:
 	set_filter("")  # affiche tout par défaut
-
-
 
 # ---------------------------------------------------------------------
 # 🔍 Applique un filtre par sous-dossier
@@ -24,8 +21,6 @@ func _ready() -> void:
 func set_filter(subfolder: String) -> void:
 	filter_folder = subfolder
 	_load_all_models()
-
-
 
 # ---------------------------------------------------------------------
 # 🔄 Recharge la liste selon le filtre
@@ -102,7 +97,7 @@ func _add_model_preview(model_path: String) -> void:
 	vb.add_child(preview)
 
 	var label := Label.new()
-	label.text = model_path.get_file().trim_suffix(".gltf").trim_suffix(".glb")
+	label.text = model_path.get_file().trim_suffix(".gltf").trim_suffix(".glb").trim_prefix("hex_")
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))

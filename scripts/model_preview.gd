@@ -27,7 +27,7 @@ func _ready() -> void:
 	if not model_path.is_empty() and model_instance == null:
 		_load_model(model_path)
 
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _process(delta: float) -> void:
