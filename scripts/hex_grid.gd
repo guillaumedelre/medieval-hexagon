@@ -1,7 +1,7 @@
 extends Node3D
 class_name HexGrid
 
-@export var radius: int = 30
+@export var radius: int = 128
 @export var tile_size: float = 1.0
 @export var hover_color: Color = Color(1, 1, 0, 0.5)
 @export var base_color: Color = Color(0.6, 0.6, 0.6, 0.1)

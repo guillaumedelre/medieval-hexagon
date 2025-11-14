@@ -158,6 +158,7 @@ func _update_highlight() -> void:
 		var occupied := tiles.has(key)
 		ghost_tile.set_valid_state(not occupied)
 
+		
 func _place_tile_from_mouse() -> void:
 	if current_model_path == "":
 		print("⚠️ Aucun modèle sélectionné.")
