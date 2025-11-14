@@ -1,17 +1,36 @@
-[gd_scene load_steps=10 format=3 uid="uid://bmvl0mmvq2xrt"]
+[gd_scene load_steps=11 format=3 uid="uid://bmvl0mmvq2xrt"]
 
 [ext_resource type="Script" uid="uid://b4bjbpkgyull3" path="res://scripts/map_editor.gd" id="1_fxgqh"]
 [ext_resource type="Script" uid="uid://bhfxbci4dpeyx" path="res://scripts/camera_controller.gd" id="2_rwdrj"]
-[ext_resource type="PackedScene" uid="uid://8toy2in00qm6" path="res://scenes/HexGrid.tscn" id="2_y6um0"]
+[ext_resource type="PackedScene" uid="uid://c1j0jj480jij5" path="res://scenes/HexGrid.tscn" id="2_y6um0"]
 [ext_resource type="PackedScene" uid="uid://bo6ei0t8ag4st" path="res://scenes/GhostTile.tscn" id="3_cio15"]
 [ext_resource type="Script" uid="uid://bwr2dtr05y1dy" path="res://scripts/top_bar.gd" id="4_2jvji"]
 [ext_resource type="Environment" uid="uid://dj268r1axdpa0" path="res://default_env.tres" id="4_rwdrj"]
 [ext_resource type="FontFile" uid="uid://c81ebf4wibc8j" path="res://fonts/Font Awesome 7 Sharp-Regular-400.otf" id="5_2jvji"]
 [ext_resource type="PackedScene" uid="uid://cp32jgyyj222g" path="res://scenes/TileBrowser.tscn" id="7_y6um0"]
 [ext_resource type="Script" uid="uid://bdu0hb2so2dbe" path="res://scripts/layer_selector.gd" id="8_cio15"]
+[ext_resource type="Script" uid="uid://dsmaugvoqml4p" path="res://scripts/day_night_cycle.gd" id="10_sa2v6"]
 
 [node name="MapEditor" type="Node3D" groups=["terrain_generator"]]
 script = ExtResource("1_fxgqh")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot" groups=["main_camera"]]
+script = ExtResource("2_rwdrj")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("4_rwdrj")
+
+[node name="DayNightCycle" type="Node3D" parent="." node_paths=PackedStringArray("sun_pivot", "moon_pivot", "world_env")]
+script = ExtResource("10_sa2v6")
+sun_pivot = NodePath("SunPivot")
+moon_pivot = NodePath("MoonPivot")
+world_env = NodePath("../WorldEnvironment")
+
+[node name="SunPivot" type="Node3D" parent="DayNightCycle"]
+
+[node name="MoonPivot" type="Node3D" parent="DayNightCycle"]
 
 [node name="Layers" type="Node3D" parent="."]
 
@@ -24,18 +43,6 @@ script = ExtResource("1_fxgqh")
 [node name="HexGrid" parent="." instance=ExtResource("2_y6um0")]
 
 [node name="GhostTile" parent="." instance=ExtResource("3_cio15")]
-
-[node name="CameraPivot" type="Node3D" parent="."]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="CameraPivot"]
-environment = ExtResource("4_rwdrj")
-
-[node name="Camera3D" type="Camera3D" parent="CameraPivot" groups=["main_camera"]]
-script = ExtResource("2_rwdrj")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.707106, 0.707106, 0, -0.707106, 0.707106, 0, 10, 0)
-shadow_enabled = true
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3

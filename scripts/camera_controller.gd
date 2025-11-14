@@ -2,7 +2,7 @@ extends Camera3D
 
 signal camera_moved(position: Vector3, rotation: Vector3)
 
-@export var move_speed: float = 20.0
+@export var move_speed: float = 50.0
 @export var vertical_speed: float = 15.0
 @export var rotate_keys_speed: float = 60.0
 @export var orbit_sensitivity: float = 0.005

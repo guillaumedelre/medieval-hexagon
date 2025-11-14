@@ -112,29 +112,30 @@ func _on_model_selected(path: String) -> void:
 # 🔥 Correction complète du RAYCAST
 # -------------------------------------------------------
 func _raycast_from_mouse() -> Dictionary:
+	var cam := camera
+	if cam == null:
+		return {}
+
 	var mouse := get_viewport().get_mouse_position()
-	var origin := camera.project_ray_origin(mouse)
-	var dir := camera.project_ray_normal(mouse)
+	var origin := cam.project_ray_origin(mouse)
+	var dir := cam.project_ray_normal(mouse)
+
 	var space := get_world_3d().direct_space_state
+	var params := PhysicsRayQueryParameters3D.new()
 
-	var params := PhysicsRayQueryParameters3D.create(origin, origin + dir * 2000.0)
-
-	# 🔥 Ajout 1 : détecter toutes les collisions
-	params.collide_with_areas = true
+	params.from = origin
+	params.to = origin + dir * 5000.0
+	params.collide_with_areas = false
 	params.collide_with_bodies = true
 
-	# 🔥 Ajout 2 : raycast stable même si la caméra touche un collider
-	params.hit_from_inside = true
-
-	# 🔥 Ajout 3 : tout layer
-	params.collision_mask = 0xFFFFFFFF
+	# 🔥 IMPORTANT : la grille est sur la layer 1 → on ne touche QUE ça
+	params.collision_mask = 1
 
 	return space.intersect_ray(params)
 
 
 func _update_highlight() -> void:
 	var result := _raycast_from_mouse()
-
 	if result.is_empty():
 		hex_grid.highlight(-999, -999)
 		if ghost_tile: ghost_tile.visible = false
