@@ -47,9 +47,9 @@ func _process(delta: float) -> void:
 	if Input.is_action_pressed("move_down"): pivot.position.y -= vertical_speed * delta
 
 	# --- Rotation avec touches (Y) ---
-	if Input.is_action_pressed("move_rotate_left"):
+	if Input.is_action_pressed("move_rotate_horary"):
 		pivot.rotate_y(deg_to_rad(-rotate_keys_speed * delta))
-	elif Input.is_action_pressed("move_rotate_right"):
+	elif Input.is_action_pressed("move_rotate_antihorary"):
 		pivot.rotate_y(deg_to_rad(rotate_keys_speed * delta))
 
 	# --- Orbit caméra avec clic molette (rotation instantanée) ---
@@ -57,12 +57,6 @@ func _process(delta: float) -> void:
 		var v: Vector2 = Input.get_last_mouse_velocity()
 		var delta_yaw := -v.x * orbit_sensitivity * delta
 		_rotate_around_point(orbit_center, delta_yaw)
-
-	# --- Zoom ---
-	#var current_distance: float = -position.z
-	#var target_distance: float = clamp(zoom_target, min_distance, max_distance)
-	#var new_distance: float = lerp(current_distance, target_distance, 6.0 * delta)
-	#position.z = -new_distance
 
 	# --- Détection de mouvement pour UI ---
 	if global_position != _last_position or rotation != _last_rotation:

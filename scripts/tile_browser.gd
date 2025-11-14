@@ -103,7 +103,6 @@ func _add_model_preview(model_path: String) -> void:
 	label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
 	label.add_theme_font_size_override("font_size", 16)
 	vb.add_child(label)
-	print(preview.size)
 
 	vb.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed:

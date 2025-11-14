@@ -16,6 +16,7 @@ var current_layer_name: String = "terrain"
 var current_model_path: String = ""
 var math: HexMath
 var tiles: Dictionary = {} # clé: layer:q:r
+var ghost_rotation_deg: float = 0.0
 
 
 func _ready() -> void:
@@ -36,16 +37,40 @@ func _physics_process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
+	# --- ANNULATION DU PLACEMENT ---
+	if event.is_action_pressed("ui_cancel"):
+		if current_model_path != "":
+			print("❌ Placement annulé")
 
+			current_model_path = ""
+			ghost_rotation_deg = 0.0
+
+			if ghost_tile:
+				ghost_tile.visible = false
+				ghost_tile.rotation.y = 0.0
+			return  # empêcher les autres actions
+	
+	if event is InputEventMouseButton and event.pressed:
 		# Empêcher les clics pendant que la souris est sur l’UI
 		if get_viewport().gui_get_hovered_control() != null:
 			return
-
 		match event.button_index:
 			MOUSE_BUTTON_LEFT:	_place_tile_from_mouse()
 			MOUSE_BUTTON_RIGHT:	_remove_tile_from_mouse()
+	
+	if event is InputEventKey and event.pressed:
+		if Input.is_action_pressed("rotate_ghost_horary"):
+			if event.shift_pressed:
+				ghost_rotation_deg += 60.0
+			else:
+				ghost_rotation_deg -= 60.0
 
+		ghost_rotation_deg = fmod(ghost_rotation_deg, 360.0)
+
+		if ghost_tile:
+			ghost_tile.rotation.y = deg_to_rad(ghost_rotation_deg)
+
+		return
 
 func _on_layer_changed(layer_name: String) -> void:
 	current_layer_name = layer_name
@@ -127,11 +152,11 @@ func _update_highlight() -> void:
 	if ghost_tile:
 		ghost_tile.visible = current_model_path != ""
 		ghost_tile.global_position = world_pos
+		ghost_tile.rotation.y = deg_to_rad(ghost_rotation_deg)
 
 		var key := _make_key(current_layer_name, q, r)
 		var occupied := tiles.has(key)
 		ghost_tile.set_valid_state(not occupied)
-
 
 func _place_tile_from_mouse() -> void:
 	if current_model_path == "":
@@ -139,7 +164,8 @@ func _place_tile_from_mouse() -> void:
 		return
 
 	var hit := _raycast_from_mouse()
-	if hit.is_empty(): return
+	if hit.is_empty():
+		return
 	
 	var axial := math.world_to_axial(hit.position)
 	var q := int(axial.x)
@@ -157,6 +183,11 @@ func _place_tile_from_mouse() -> void:
 
 	var inst: Node3D = scene.instantiate()
 	inst.position = math.axial_to_world(q, r)
+
+	# 🔥 AJOUT : applique la rotation du GhostTile si présent
+	if ghost_tile:
+		inst.rotation = ghost_tile.rotation
+
 	current_layer.add_child(inst)
 	tiles[key] = inst
 
