@@ -28,10 +28,6 @@ window/size/viewport_height=1080
 
 warnings_as_errors=true
 
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/RadialMenu/plugin.cfg")
-
 [gui]
 
 theme/custom="uid://bnixf3fwah8ct"
