@@ -1,8 +1,8 @@
 extends Node3D
 class_name MapEditor
 
-@onready var tile_browser: TileBrowser = $UI/TileBrowser
-@onready var layer_selector: LayerSelector = $UI/LayerSelector
+@onready var tile_browser: TileBrowser = $UI/VBoxContainer/TileBrowser
+@onready var layer_selector: LayerSelector = $UI/VBoxContainer/LayerSelector
 @onready var hex_grid: HexGrid = $HexGrid
 @onready var ghost_tile: GhostTile = $GhostTile
 @onready var camera: Camera3D = $CameraPivot/Camera3D
@@ -12,7 +12,7 @@ class_name MapEditor
 @onready var resource_layer: Node3D = $Layers/ResourceLayer
 
 var current_layer: Node3D
-var current_layer_name: String = "terrain"
+var current_layer_name: String = ""
 var current_model_path: String = ""
 var math: HexMath
 var tiles: Dictionary = {} # clé: layer:q:r
@@ -28,6 +28,7 @@ func _ready() -> void:
 
 	if layer_selector and not layer_selector.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
 		layer_selector.layer_changed.connect(Callable(self, "_on_layer_changed"))
+		layer_selector.get_node("HBoxContainer/TerrainButton").emit_signal("pressed")
 
 	print("✅ MapEditor prêt.")
 
@@ -161,6 +162,9 @@ func _update_highlight() -> void:
 
 		
 func _place_tile_from_mouse() -> void:
+	if current_layer_name == "":
+		print("⚠️ Aucun layer sélectionné.")
+		return
 	if current_model_path == "":
 		print("⚠️ Aucun modèle sélectionné.")
 		return

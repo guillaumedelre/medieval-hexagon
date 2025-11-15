@@ -77,12 +77,12 @@ func _process(delta: float) -> void:
 # ======================================================
 # UPDATE LIGHTS + ARROWS
 # ======================================================
-func _update_light_and_arrow(light: DirectionalLight3D, arrow: Node3D, pos: Vector3) -> void:
-	light.global_position = pos
-	light.look_at(grid_center, Vector3.UP)
+func _update_light_and_arrow(_light: DirectionalLight3D, _arrow: Node3D, _pos: Vector3) -> void:
+	_light.global_position = _pos
+	_light.look_at(grid_center, Vector3.UP)
 
-	#var dir := -light.global_transform.basis.z.normalized()
-	#arrow.global_transform = Transform3D(Basis.looking_at(dir, Vector3.UP), arrow.global_position)
+	#var dir := -_light.global_transform.basis.z.normalized()
+	#_arrow.global_transform = Transform3D(Basis.looking_at(dir, Vector3.UP), _arrow.global_position)
 
 
 # ======================================================

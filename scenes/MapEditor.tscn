@@ -99,49 +99,43 @@ theme_override_fonts/font = ExtResource("5_2jvji")
 layout_mode = 2
 theme_override_fonts/font = ExtResource("9_uxhdd")
 
-[node name="LayerSelector" type="Control" parent="UI"]
-custom_minimum_size = Vector2(0, 32)
+[node name="VBoxContainer" type="VBoxContainer" parent="UI"]
 layout_mode = 1
-anchor_top = 0.582
+anchors_preset = 12
+anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 0.63100004
-offset_left = 2.0
-offset_top = 140.86398
-offset_right = 2.0
-offset_bottom = 141.11197
+anchor_bottom = 1.0
+offset_top = -153.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
+
+[node name="LayerSelector" type="Control" parent="UI/VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
 script = ExtResource("8_cio15")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/LayerSelector"]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer/LayerSelector"]
 layout_mode = 0
 offset_top = -9.0
 offset_right = 201.0
 offset_bottom = 31.0
 
-[node name="TerrainButton" type="Button" parent="UI/LayerSelector/HBoxContainer"]
+[node name="TerrainButton" type="Button" parent="UI/VBoxContainer/LayerSelector/HBoxContainer"]
 layout_mode = 2
-text = "Base"
+text = "Terrain"
 
-[node name="BuildingButton" type="Button" parent="UI/LayerSelector/HBoxContainer"]
+[node name="BuildingButton" type="Button" parent="UI/VBoxContainer/LayerSelector/HBoxContainer"]
 layout_mode = 2
 text = "Buildings"
 
-[node name="ResourceButton" type="Button" parent="UI/LayerSelector/HBoxContainer"]
+[node name="ResourceButton" type="Button" parent="UI/VBoxContainer/LayerSelector/HBoxContainer"]
 layout_mode = 2
 text = "Resources"
 
-[node name="TileBrowser" parent="UI" instance=ExtResource("7_y6um0")]
-layout_mode = 1
-anchor_top = 0.84700006
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = 0.14398193
-offset_right = 0.0
-offset_bottom = 0.0
-grow_vertical = 2
+[node name="TileBrowser" parent="UI/VBoxContainer" instance=ExtResource("7_y6um0")]
+layout_mode = 2
+size_flags_vertical = 3
 
-[connection signal="pressed" from="UI/LayerSelector/HBoxContainer/TerrainButton" to="UI/LayerSelector" method="_on_TerrainButton_pressed"]
-[connection signal="pressed" from="UI/LayerSelector/HBoxContainer/BuildingButton" to="UI/LayerSelector" method="_on_BuildingButton_pressed"]
-[connection signal="pressed" from="UI/LayerSelector/HBoxContainer/ResourceButton" to="UI/LayerSelector" method="_on_ResourceButton_pressed"]
+[connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/TerrainButton" to="UI/VBoxContainer/LayerSelector" method="_on_TerrainButton_pressed"]
+[connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/BuildingButton" to="UI/VBoxContainer/LayerSelector" method="_on_BuildingButton_pressed"]
+[connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/ResourceButton" to="UI/VBoxContainer/LayerSelector" method="_on_ResourceButton_pressed"]

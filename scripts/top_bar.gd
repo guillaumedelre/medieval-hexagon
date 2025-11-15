@@ -10,7 +10,7 @@ extends HBoxContainer
 @onready var label_height_icon: Label = $LabelHeightIcon
 @onready var label_layer_icon: Label = $LabelLayerIcon
 @onready var label_fps_icon: Label = $LabelFPSIcon
-@onready var layer_selector: LayerSelector = get_node("../LayerSelector")
+@onready var layer_selector: LayerSelector = get_node("../VBoxContainer/LayerSelector")
 
 var camera: Camera3D = null
 var math: Node = null

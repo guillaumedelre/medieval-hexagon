@@ -14,6 +14,11 @@ config/name="Medieval Hexagon"
 run/main_scene="res://scenes/MapEditor.tscn"
 config/features=PackedStringArray("4.5")
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
 [editor]
 
 warnings_as_errors=true
