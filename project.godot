@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="Medieval Hexagon"
-run/main_scene="res://scenes/MapEditor.tscn"
+run/main_scene="uid://s7pmrrfyckou"
 config/features=PackedStringArray("4.5")
+
+[autoload]
+
+FileManager="*res://scripts/file_manager.gd"
+DialogUtils="*res://scripts/dialog_utils.gd"
 
 [display]
 

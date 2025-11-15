@@ -111,6 +111,16 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("9_uxhdd")
 text = "test"
 
+[node name="LabelMapIcon" type="Label" parent="UI/TopBar"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_2jvji")
+text = ""
+
+[node name="LabelMap" type="Label" parent="UI/TopBar"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_uxhdd")
+text = "test"
+
 [node name="VBoxContainer" type="VBoxContainer" parent="UI"]
 layout_mode = 1
 anchors_preset = 12
@@ -152,8 +162,6 @@ size_flags_vertical = 3
 script = ExtResource("12_0d0we")
 
 [node name="RadialMenu" parent="UI/MainMenu" instance=ExtResource("13_5e2lu")]
-visible = false
-custom_minimum_size = Vector2(300, 222.26306)
 
 [connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/TerrainButton" to="UI/VBoxContainer/LayerSelector" method="_on_TerrainButton_pressed"]
 [connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/BuildingButton" to="UI/VBoxContainer/LayerSelector" method="_on_BuildingButton_pressed"]

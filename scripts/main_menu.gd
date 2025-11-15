@@ -80,9 +80,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func _on_radial_menu_item_selected(id: Variant, position: Variant) -> void:
-	match id:
+func _on_radial_menu_item_selected(_menu_id: Variant, _position: Variant) -> void:
+	match _menu_id:
 		"quit":
 			get_tree().quit()
 		_:
-			print(id)
+			print(_menu_id)

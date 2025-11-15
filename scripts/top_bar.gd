@@ -5,10 +5,13 @@ extends HBoxContainer
 @onready var label_height: Label = $LabelHeight
 @onready var label_layer: Label = $LabelLayer
 @onready var label_fps: Label = $LabelFPS
+@onready var label_map: Label = $LabelMap
+
 @onready var label_camera_icon: Label = $LabelCameraIcon
 @onready var label_tile_icon: Label = $LabelTileIcon
 @onready var label_height_icon: Label = $LabelHeightIcon
 @onready var label_layer_icon: Label = $LabelLayerIcon
+@onready var label_map_icon: Label = $LabelMapIcon
 @onready var label_fps_icon: Label = $LabelFPSIcon
 @onready var layer_selector: LayerSelector = get_node("../VBoxContainer/LayerSelector")
 
@@ -27,6 +30,7 @@ func _ready() -> void:
 	label_height_icon.text = "\uF6FC"
 	label_fps_icon.text = "\uF611"
 	label_layer_icon.text = "\uF5FD"
+	label_map_icon.text = "\uF279"
 	
 	if layer_selector and not layer_selector.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
 		layer_selector.layer_changed.connect(Callable(self, "_on_layer_changed"))

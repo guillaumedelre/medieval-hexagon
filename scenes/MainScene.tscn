@@ -1,0 +1,177 @@
+[gd_scene load_steps=2 format=3 uid="uid://s7pmrrfyckou"]
+
+[ext_resource type="Script" uid="uid://cl6wjy5l4f6ie" path="res://scripts/main_scene.gd" id="1_echbf"]
+
+[node name="MainScene" type="Control"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+script = ExtResource("1_echbf")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -128.0
+offset_top = 344.0
+offset_right = 128.0
+offset_bottom = 526.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Medieval Hexagon"
+horizontal_alignment = 1
+
+[node name="Divider" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+
+[node name="GameFold" type="FoldableContainer" parent="VBoxContainer"]
+layout_mode = 2
+folded = true
+title = "Game"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/GameFold"]
+visible = false
+layout_mode = 2
+
+[node name="SoloButton" type="Button" parent="VBoxContainer/GameFold/VBoxContainer"]
+layout_mode = 2
+text = "Solo"
+
+[node name="MultiButton" type="Button" parent="VBoxContainer/GameFold/VBoxContainer"]
+layout_mode = 2
+text = "Multi"
+
+[node name="EditorFold" type="FoldableContainer" parent="VBoxContainer"]
+layout_mode = 2
+folded = true
+title = "Editeur"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/EditorFold"]
+visible = false
+layout_mode = 2
+
+[node name="NewMapButton" type="Button" parent="VBoxContainer/EditorFold/VBoxContainer"]
+layout_mode = 2
+text = "New map"
+
+[node name="OpenMapButton" type="Button" parent="VBoxContainer/EditorFold/VBoxContainer"]
+layout_mode = 2
+text = "Open map"
+
+[node name="OptionsButton" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Options"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Quitter"
+
+[node name="WindowNewMap" type="Window" parent="."]
+oversampling_override = 1.0
+title = "New map"
+position = Vector2i(0, 36)
+size = Vector2i(320, 99)
+wrap_controls = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowNewMap"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowNewMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="WindowNewMap/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Radius"
+
+[node name="SpinBox" type="SpinBox" parent="WindowNewMap/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 16.0
+max_value = 128.0
+value = 40.0
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="WindowNewMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="WindowNewMap/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Nom"
+
+[node name="LineEdit" type="LineEdit" parent="WindowNewMap/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="WindowNewMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="CancelNewMapButton" type="Button" parent="WindowNewMap/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="CreateNewMapButton" type="Button" parent="WindowNewMap/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "OK"
+
+[node name="WindowOpenMap" type="Window" parent="."]
+oversampling_override = 1.0
+title = "Open map"
+position = Vector2i(0, 36)
+size = Vector2i(320, 124)
+wrap_controls = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowOpenMap"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="WindowOpenMap/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Choose a map:"
+
+[node name="MapList" type="ItemList" parent="WindowOpenMap/VBoxContainer"]
+layout_mode = 2
+auto_width = true
+auto_height = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowOpenMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="CancelOpenMapButton" type="Button" parent="WindowOpenMap/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="DoOpenMapButton" type="Button" parent="WindowOpenMap/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Open"
+
+[connection signal="pressed" from="VBoxContainer/EditorFold/VBoxContainer/NewMapButton" to="." method="_on_new_map_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/EditorFold/VBoxContainer/OpenMapButton" to="." method="_on_open_map_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
+[connection signal="close_requested" from="WindowNewMap" to="." method="_on_window_new_map_close_requested"]
+[connection signal="pressed" from="WindowNewMap/VBoxContainer/HBoxContainer2/CancelNewMapButton" to="." method="_on_window_new_map_close_requested"]
+[connection signal="pressed" from="WindowNewMap/VBoxContainer/HBoxContainer2/CreateNewMapButton" to="." method="_on_create_new_map_button_pressed"]
+[connection signal="close_requested" from="WindowOpenMap" to="." method="_on_window_open_map_close_requested"]
+[connection signal="ready" from="WindowOpenMap" to="." method="_on_window_open_map_ready"]
+[connection signal="pressed" from="WindowOpenMap/VBoxContainer/HBoxContainer/CancelOpenMapButton" to="." method="_on_window_open_map_close_requested"]
+[connection signal="pressed" from="WindowOpenMap/VBoxContainer/HBoxContainer/DoOpenMapButton" to="." method="_on_do_open_map_button_pressed"]

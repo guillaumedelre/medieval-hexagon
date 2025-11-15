@@ -5,7 +5,7 @@ class_name HexGrid
 # PARAMÈTRES
 # -------------------------------------------------------------------
 @export var grid_radius: int = 40                  # rayon de la grille (axial)
-@export var tile_size: float = 1.0                 # taille d’un hex
+@export var tile_size: float = 1.1547              # taille d’un hex
 @export var outline_color: Color = Color(1, 1, 1, 0.01)
 
 var mm: MultiMesh                                  # MultiMesh visuel
@@ -23,12 +23,35 @@ var math := preload("res://scripts/hex_math.gd").new()
 func _ready() -> void:
 	# On synchronise la taille des tuiles entre la grille et les maths
 	math.TILE_SIZE = tile_size
+	_regenerate()
+
+
+# -------------------------------------------------------------------
+# API PUBLIQUE : changer le rayon depuis l’extérieur (MapEditor)
+# -------------------------------------------------------------------
+func set_grid_radius(new_radius: int) -> void:
+	if new_radius == grid_radius:
+		return
+
+	grid_radius = new_radius
+	_regenerate()
+
+
+# -------------------------------------------------------------------
+# RE-GÉNÈRE TOUT (visuel + collisions)
+# -------------------------------------------------------------------
+func _regenerate() -> void:
+	# Nettoyage
+	if mm_instance:
+		mm_instance.multimesh = null
+	if coll_shape:
+		coll_shape.shape = null
 
 	_generate_visual_mesh()
 	_generate_collision_mesh()
 
 	if mm:
-		print("🌐 HexGrid optimisée prête. Instances =", mm.instance_count)
+		print("🌐 HexGrid %d optimisée prête. Instances = %d" % [grid_radius, mm.instance_count])
 	else:
 		print("⚠️ HexGrid : MultiMesh non généré.")
 
@@ -49,9 +72,9 @@ func _generate_visual_mesh() -> void:
 
 	var i := 0
 	for c in cells:
-		var cell := c as Vector2
-		var q := int(cell.x)
-		var r := int(cell.y)
+		var cell: Vector2 = c as Vector2
+		var q: int = int(cell.x)
+		var r: int = int(cell.y)
 		var pos: Vector3 = math.axial_to_world(q, r)
 		mm.set_instance_transform(i, Transform3D(Basis(), pos))
 		i += 1
@@ -69,13 +92,13 @@ func _generate_collision_mesh() -> void:
 	var cells: Array = _generate_axial_list()
 
 	for c in cells:
-		var cell := c as Vector2
-		var q := int(cell.x)
-		var r := int(cell.y)
+		var cell: Vector2 = c as Vector2
+		var q: int = int(cell.x)
+		var r: int = int(cell.y)
 		var center: Vector3 = math.axial_to_world(q, r)
 		_add_hex_collision(st, center, tile_size)
 
-	var col_mesh := st.commit() as ArrayMesh
+	var col_mesh: ArrayMesh = st.commit() as ArrayMesh
 	if col_mesh == null:
 		push_warning("HexGrid: échec génération mesh de collision")
 		return
@@ -107,8 +130,8 @@ func _create_hex_outline_mesh(size: float) -> Mesh:
 	st.begin(Mesh.PRIMITIVE_LINE_STRIP)
 
 	for i in range(7):
-		var corner := math.hex_corner(size, i % 6)
-		st.set_color(outline_color) # alpha OK, mais ignoré sans matériel
+		var corner: Vector3 = math.hex_corner(size, i % 6)
+		st.set_color(outline_color) # alpha respecté via matériau
 		st.add_vertex(corner)
 
 	var mesh := st.commit()
@@ -119,8 +142,8 @@ func _create_hex_outline_mesh(size: float) -> Mesh:
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.vertex_color_use_as_albedo = true 
-	mat.render_priority = 1  # pour éviter les artefacts
+	mat.vertex_color_use_as_albedo = true
+	mat.render_priority = 1  # limite les artefacts
 
 	mesh.surface_set_material(0, mat)
 
@@ -145,8 +168,7 @@ func _add_hex_collision(st: SurfaceTool, center: Vector3, size: float) -> void:
 
 
 # -------------------------------------------------------------------
-# highlight (pour l’instant, rien de visuel, juste un hook possible)
+# highlight (hook possible si tu veux un visuel plus tard)
 # -------------------------------------------------------------------
 func highlight(_q: int, _r: int) -> void:
-	# Si tu veux, on pourra rajouter un Mesh sur la case courante
 	pass

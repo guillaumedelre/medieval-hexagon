@@ -1,6 +1,7 @@
 extends Node3D
 class_name MapEditor
 
+@export var map_file_path: String = ""    # ← chemin de la carte (user://maps/xxx.json)
 
 @onready var tile_browser: TileBrowser = $UI/VBoxContainer/TileBrowser
 @onready var layer_selector: LayerSelector = $UI/VBoxContainer/LayerSelector
@@ -14,6 +15,7 @@ class_name MapEditor
 var current_layer: Node3D
 var current_layer_name: String = ""
 var current_model_path: String = ""
+var map_name: String = ""
 var math: HexMath
 var tiles: Dictionary = {} # clé: layer:q:r
 var ghost_rotation_deg: float = 0.0
@@ -28,7 +30,12 @@ func _ready() -> void:
 
 	if layer_selector and not layer_selector.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
 		layer_selector.layer_changed.connect(Callable(self, "_on_layer_changed"))
+		# Simule un clic sur "Terrain" au démarrage
 		layer_selector.get_node("HBoxContainer/TerrainButton").emit_signal("pressed")
+
+	# Si un fichier de carte est défini → on le charge
+	if map_file_path != "":
+		load_map(map_file_path)
 
 	print("✅ MapEditor prêt.")
 
@@ -56,8 +63,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if get_viewport().gui_get_hovered_control() != null:
 			return
 		match event.button_index:
-			MOUSE_BUTTON_LEFT:	_place_tile_from_mouse()
-			MOUSE_BUTTON_RIGHT:	_remove_tile_from_mouse()
+			MOUSE_BUTTON_LEFT:
+				_place_tile_from_mouse()
+			MOUSE_BUTTON_RIGHT:
+				_remove_tile_from_mouse()
 	
 	if event is InputEventKey and event.pressed:
 		if Input.is_action_pressed("rotate_ghost_horary"):
@@ -73,17 +82,18 @@ func _unhandled_input(event: InputEvent) -> void:
 
 		return
 
+
 func _on_layer_changed(layer_name: String) -> void:
 	current_layer_name = layer_name
 
 	match layer_name:
-		"terrain":	
+		"terrain":
 			current_layer = terrain_layer
 			tile_browser.set_filter("tiles")
-		"building":	
+		"building":
 			current_layer = building_layer
 			tile_browser.set_filter("buildings")
-		"resource":	
+		"resource":
 			current_layer = resource_layer
 			tile_browser.set_filter("decoration")
 		_:
@@ -110,7 +120,7 @@ func _on_model_selected(path: String) -> void:
 
 
 # -------------------------------------------------------
-# 🔥 Correction complète du RAYCAST
+# 🔥 Raycast grille
 # -------------------------------------------------------
 func _raycast_from_mouse() -> Dictionary:
 	var cam := camera
@@ -139,7 +149,8 @@ func _update_highlight() -> void:
 	var result := _raycast_from_mouse()
 	if result.is_empty():
 		hex_grid.highlight(-999, -999)
-		if ghost_tile: ghost_tile.visible = false
+		if ghost_tile:
+			ghost_tile.visible = false
 		return
 
 	var hit_pos : Vector3 = result.position
@@ -160,7 +171,7 @@ func _update_highlight() -> void:
 		var occupied := tiles.has(key)
 		ghost_tile.set_valid_state(not occupied)
 
-		
+
 func _place_tile_from_mouse() -> void:
 	if current_layer_name == "":
 		print("⚠️ Aucun layer sélectionné.")
@@ -202,7 +213,8 @@ func _place_tile_from_mouse() -> void:
 
 func _remove_tile_from_mouse() -> void:
 	var hit := _raycast_from_mouse()
-	if hit.is_empty(): return
+	if hit.is_empty():
+		return
 
 	var axial := math.world_to_axial(hit.position)
 	var q := int(axial.x)
@@ -221,3 +233,35 @@ func _remove_tile_from_mouse() -> void:
 
 func _make_key(layer_name: String, q: int, r: int) -> String:
 	return "%s:%d:%d" % [layer_name, q, r]
+
+
+# -------------------------------------------------------
+#  CHARGEMENT D’UNE CARTE JSON
+# -------------------------------------------------------
+func load_map(_map_file_path: String) -> void:
+	if _map_file_path == "":
+		push_warning("⚠️ load_map appelé sans chemin.")
+		return
+
+	var file := FileAccess.open(_map_file_path, FileAccess.READ)
+	if file == null:
+		push_warning("❌ Impossible d’ouvrir la carte : %s" % _map_file_path)
+		return
+
+	var content := file.get_as_text()
+	file.close()
+
+	var parsed : Dictionary = JSON.parse_string(content)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		push_warning("❌ Fichier de carte invalide : %s" % _map_file_path)
+		return
+
+	var map_data: Dictionary = parsed
+
+	if map_data.has("radius"):
+		var r := int(map_data["radius"])
+		hex_grid.set_grid_radius(r)
+		$UI/TopBar/LabelMap.text = map_data["name"]
+		print("📐 Carte chargée, radius =", r)
+	else:
+		push_warning("ℹ️ La carte ne contient pas de champ 'radius'.")
