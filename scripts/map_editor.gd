@@ -1,12 +1,12 @@
 extends Node3D
 class_name MapEditor
 
+
 @onready var tile_browser: TileBrowser = $UI/VBoxContainer/TileBrowser
 @onready var layer_selector: LayerSelector = $UI/VBoxContainer/LayerSelector
 @onready var hex_grid: HexGrid = $HexGrid
 @onready var ghost_tile: GhostTile = $GhostTile
 @onready var camera: Camera3D = $CameraPivot/Camera3D
-
 @onready var terrain_layer: Node3D = $Layers/TerrainLayer
 @onready var building_layer: Node3D = $Layers/BuildingLayer
 @onready var resource_layer: Node3D = $Layers/ResourceLayer

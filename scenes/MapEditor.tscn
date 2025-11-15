@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bmvl0mmvq2xrt"]
+[gd_scene load_steps=14 format=3 uid="uid://bmvl0mmvq2xrt"]
 
 [ext_resource type="Script" uid="uid://b4bjbpkgyull3" path="res://scripts/map_editor.gd" id="1_fxgqh"]
 [ext_resource type="Script" uid="uid://bhfxbci4dpeyx" path="res://scripts/camera_controller.gd" id="2_rwdrj"]
@@ -11,6 +11,8 @@
 [ext_resource type="Script" uid="uid://bdu0hb2so2dbe" path="res://scripts/layer_selector.gd" id="8_cio15"]
 [ext_resource type="FontFile" uid="uid://dwcywqgwut513" path="res://fonts/IMFellEnglishSC-Regular.ttf" id="9_uxhdd"]
 [ext_resource type="Script" uid="uid://dsmaugvoqml4p" path="res://scripts/day_night_cycle.gd" id="10_sa2v6"]
+[ext_resource type="Script" uid="uid://c20mv7vi4qqop" path="res://scripts/main_menu.gd" id="12_0d0we"]
+[ext_resource type="PackedScene" uid="uid://iopwhmejcr8b" path="res://addons/RadialMenu/RadialMenu.tscn" id="13_5e2lu"]
 
 [node name="MapEditor" type="Node3D" groups=["terrain_generator"]]
 script = ExtResource("1_fxgqh")
@@ -66,38 +68,48 @@ script = ExtResource("4_2jvji")
 [node name="LabelTileIcon" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
+text = ""
 
 [node name="LabelTile" type="Label" parent="UI/TopBar"]
 layout_mode = 2
+text = "test"
 
 [node name="LabelCameraIcon" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
+text = ""
 
 [node name="LabelCamera" type="Label" parent="UI/TopBar"]
 layout_mode = 2
+text = "test"
 
 [node name="LabelHeightIcon" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
+text = ""
 
 [node name="LabelHeight" type="Label" parent="UI/TopBar"]
 layout_mode = 2
+text = "test"
 
 [node name="LabelFPSIcon" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
+text = ""
 
 [node name="LabelFPS" type="Label" parent="UI/TopBar"]
 layout_mode = 2
+text = "test"
 
 [node name="LabelLayerIcon" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
+text = ""
 
 [node name="LabelLayer" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("9_uxhdd")
+text = "test"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI"]
 layout_mode = 1
@@ -126,16 +138,24 @@ text = "Terrain"
 
 [node name="BuildingButton" type="Button" parent="UI/VBoxContainer/LayerSelector/HBoxContainer"]
 layout_mode = 2
-text = "Buildings"
+text = "Bâtiments"
 
 [node name="ResourceButton" type="Button" parent="UI/VBoxContainer/LayerSelector/HBoxContainer"]
 layout_mode = 2
-text = "Resources"
+text = "Décorations"
 
 [node name="TileBrowser" parent="UI/VBoxContainer" instance=ExtResource("7_y6um0")]
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="MainMenu" type="Node" parent="UI"]
+script = ExtResource("12_0d0we")
+
+[node name="RadialMenu" parent="UI/MainMenu" instance=ExtResource("13_5e2lu")]
+visible = false
+custom_minimum_size = Vector2(300, 222.26306)
+
 [connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/TerrainButton" to="UI/VBoxContainer/LayerSelector" method="_on_TerrainButton_pressed"]
 [connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/BuildingButton" to="UI/VBoxContainer/LayerSelector" method="_on_BuildingButton_pressed"]
 [connection signal="pressed" from="UI/VBoxContainer/LayerSelector/HBoxContainer/ResourceButton" to="UI/VBoxContainer/LayerSelector" method="_on_ResourceButton_pressed"]
+[connection signal="item_selected" from="UI/MainMenu/RadialMenu" to="UI/MainMenu" method="_on_radial_menu_item_selected"]
