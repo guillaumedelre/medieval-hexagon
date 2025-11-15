@@ -10,6 +10,7 @@ extends HBoxContainer
 @onready var label_height_icon: Label = $LabelHeightIcon
 @onready var label_layer_icon: Label = $LabelLayerIcon
 @onready var label_fps_icon: Label = $LabelFPSIcon
+@onready var layer_selector: LayerSelector = get_node("../LayerSelector")
 
 var camera: Camera3D = null
 var math: Node = null
@@ -25,6 +26,11 @@ func _ready() -> void:
 	label_camera_icon.text = "\uF3C5"
 	label_height_icon.text = "\uF6FC"
 	label_fps_icon.text = "\uF611"
+	label_layer_icon.text = "\uF5FD"
+	
+	if layer_selector and not layer_selector.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
+		layer_selector.layer_changed.connect(Callable(self, "_on_layer_changed"))
+
 
 func _process(delta: float) -> void:
 	# --- FPS ---
@@ -73,3 +79,7 @@ func _find_main_camera() -> void:
 func _on_camera_moved(_position: Vector3, _rotation: Vector3) -> void:
 	label_camera.text = "%.1f, %.1f" % [_position.x, _position.z]
 	label_height.text = "️%.1f" % _position.y
+
+#  Réception du signal de changement de layer
+func _on_layer_changed(layer_name: String) -> void:
+	label_layer.text = layer_name

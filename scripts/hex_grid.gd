@@ -28,7 +28,7 @@ func _ready() -> void:
 	_generate_collision_mesh()
 
 	if mm:
-		print("🟩 HexGrid optimisée prête. Instances =", mm.instance_count)
+		print("🌐 HexGrid optimisée prête. Instances =", mm.instance_count)
 	else:
 		print("⚠️ HexGrid : MultiMesh non généré.")
 

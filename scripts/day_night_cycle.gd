@@ -13,7 +13,7 @@ class_name DayNightCycle
 
 # Astres
 const SUN_SIZE := 100.0
-const MOON_SIZE := 60.0
+const MOON_SIZE := 10.0
 const ORBIT_RADIUS := 5000.0
 
 var time := 0.25
@@ -118,7 +118,7 @@ func _create_moon() -> void:
 	sphere.radius = MOON_SIZE
 	moon_mesh.mesh = sphere
 
-	moon_mesh.material_override = _make_emissive(Color(0.7, 0.8, 1.0), 2.0)
+	moon_mesh.material_override = _make_emissive(Color(0.7, 0.8, 1.0), 1.0)
 	moon_mesh.material_override.no_depth_test = true
 
 	moon_pivot.add_child(moon_mesh)
@@ -129,7 +129,7 @@ func _create_moon() -> void:
 	moon_light.shadow_enabled = true
 	moon_mesh.add_child(moon_light)
 
-	#moon_arrow = _create_arrow(Color(0.1, 0.2, 0.6))
+	#moon_arrow = _create_arrow(Color(1.0, 1.0, 1.0, 1.0))
 	#moon_mesh.add_child(moon_arrow)
 
 
@@ -208,7 +208,7 @@ func _update_sky(strength: float) -> void:
 		var p := mat as ProceduralSkyMaterial
 		p.sky_top_color = Color(0.05,0.06,0.12).lerp(Color(0.4,0.6,1.0), strength)
 		p.sky_horizon_color = Color(0.1,0.12,0.20).lerp(Color(0.5,0.7,1.0), strength)
-		p.energy_multiplier = strength
+		p.energy_multiplier = max (0.1, strength)
 
 
 # ======================================================

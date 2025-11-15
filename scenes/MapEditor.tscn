@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bmvl0mmvq2xrt"]
+[gd_scene load_steps=12 format=3 uid="uid://bmvl0mmvq2xrt"]
 
 [ext_resource type="Script" uid="uid://b4bjbpkgyull3" path="res://scripts/map_editor.gd" id="1_fxgqh"]
 [ext_resource type="Script" uid="uid://bhfxbci4dpeyx" path="res://scripts/camera_controller.gd" id="2_rwdrj"]
@@ -9,6 +9,7 @@
 [ext_resource type="FontFile" uid="uid://c81ebf4wibc8j" path="res://fonts/Font Awesome 7 Sharp-Regular-400.otf" id="5_2jvji"]
 [ext_resource type="PackedScene" uid="uid://cp32jgyyj222g" path="res://scenes/TileBrowser.tscn" id="7_y6um0"]
 [ext_resource type="Script" uid="uid://bdu0hb2so2dbe" path="res://scripts/layer_selector.gd" id="8_cio15"]
+[ext_resource type="FontFile" uid="uid://dwcywqgwut513" path="res://fonts/IMFellEnglishSC-Regular.ttf" id="9_uxhdd"]
 [ext_resource type="Script" uid="uid://dsmaugvoqml4p" path="res://scripts/day_night_cycle.gd" id="10_sa2v6"]
 
 [node name="MapEditor" type="Node3D" groups=["terrain_generator"]]
@@ -87,15 +88,16 @@ layout_mode = 2
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
 
-[node name="LabelLayerIcon" type="Label" parent="UI/TopBar"]
+[node name="LabelFPS" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 
-[node name="LabelLayer" type="Label" parent="UI/TopBar"]
+[node name="LabelLayerIcon" type="Label" parent="UI/TopBar"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_2jvji")
 
-[node name="LabelFPS" type="Label" parent="UI/TopBar"]
+[node name="LabelLayer" type="Label" parent="UI/TopBar"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("9_uxhdd")
 
 [node name="LayerSelector" type="Control" parent="UI"]
 custom_minimum_size = Vector2(0, 32)
