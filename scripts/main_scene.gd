@@ -36,7 +36,7 @@ func _on_create_new_map_button_pressed() -> void:
 		return
 
 	if map_name == "":
-		DialogUtils.error(get_tree().current_scene, "Le nom de la carte est obligatoire.")
+		DialogUtils.error(get_tree().current_scene, "Le nom de la carte est obligatoire")
 		return
 
 	# Création du fichier
@@ -78,7 +78,7 @@ func _on_do_open_map_button_pressed() -> void:
 	var selected := map_list.get_selected_items()
 
 	if selected.size() == 0:
-		DialogUtils.error(get_tree().current_scene, "Veuillez sélectionner une carte.")
+		DialogUtils.error(get_tree().current_scene, "Veuillez sélectionner une carte")
 		return
 
 	var filename: String = map_list.get_item_text(selected[0])
@@ -99,7 +99,7 @@ func _open_map_scene(map_path: String) -> void:
 
 	var map_editor := scene.instantiate() as MapEditor
 	if map_editor == null:
-		DialogUtils.error(get_tree().current_scene, "❌ La scène MapEditor n’a pas le bon script.")
+		DialogUtils.error(get_tree().current_scene, "❌ La scène MapEditor n’a pas le bon script")
 		return
 
 	map_editor.map_file_path = map_path

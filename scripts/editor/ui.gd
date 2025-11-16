@@ -48,7 +48,7 @@ func _on_grid_cell_changed() -> void:
 	var mouse: Vector2 = get_viewport().get_mouse_position()
 	var origin: Vector3 = camera.project_ray_origin(mouse)
 	var dir: Vector3 = camera.project_ray_normal(mouse)
-	var space: PhysicsDirectSpaceState3D = camera.get_world_3d().direct_space_state  #  correction ici
+	var space: PhysicsDirectSpaceState3D = camera.get_world_3d().direct_space_state # correction ici
 	var params := PhysicsRayQueryParameters3D.create(origin, origin + dir * 5000.0)
 	params.collide_with_bodies = true
 	var hit: Dictionary = space.intersect_ray(params)

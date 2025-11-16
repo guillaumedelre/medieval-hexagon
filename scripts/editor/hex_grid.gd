@@ -4,14 +4,14 @@ class_name HexGrid
 # -------------------------------------------------------------------
 # PARAMÈTRES
 # -------------------------------------------------------------------
-@export var grid_radius: int = 40                  # rayon de la grille (axial)
-@export var tile_size: float = 1.1547              # taille d’un hex
+@export var grid_radius: int = 40 # rayon de la grille (axial)
+@export var tile_size: float = 1.1547 # taille d’un hex
 @export var outline_color: Color = Color(1, 1, 1, 0.01)
 @onready var mm_instance: MultiMeshInstance3D = $Visual
 @onready var collider: StaticBody3D = $Collider
 @onready var coll_shape: CollisionShape3D = $Collider/CollisionShape
 
-var mm: MultiMesh                                  # MultiMesh visuel
+var mm: MultiMesh # MultiMesh visuel
 
 
 # -------------------------------------------------------------------
@@ -97,7 +97,7 @@ func _generate_collision_mesh() -> void:
 
 	var col_mesh: ArrayMesh = st.commit() as ArrayMesh
 	if col_mesh == null:
-		DialogUtils.warning(get_tree().current_scene, "HexGrid: échec génération mesh de collision.")
+		DialogUtils.warning(get_tree().current_scene, "HexGrid: échec génération mesh de collision")
 		return
 
 	var faces: PackedVector3Array = col_mesh.get_faces()
@@ -140,7 +140,7 @@ func _create_hex_outline_mesh(size: float) -> Mesh:
 	mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.vertex_color_use_as_albedo = true
-	mat.render_priority = 1  # limite les artefacts
+	mat.render_priority = 1 # limite les artefacts
 
 	mesh.surface_set_material(0, mat)
 

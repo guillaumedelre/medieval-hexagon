@@ -6,13 +6,13 @@ signal model_selected(path: String)
 @onready var grid: GridContainer = $Panel/Scroll/Grid
 
 const MODEL_ROOT: String = "res://addons/kaykit_medieval_hexagon_pack/Assets/gltf"
-const PREVIEW_SIZE: Vector2 = Vector2(180, 180)
+const PREVIEW_SIZE: Vector2 = Vector2(128, 64)
 
 var models: Array[String] = []
-var filter_folder: String = ""   # sous-dossier actif
+var filter_folder: String = "" # sous-dossier actif
 
 func _ready() -> void:
-	set_filter("")  # affiche tout par défaut
+	set_filter("") # affiche tout par défaut
 
 # ---------------------------------------------------------------------
 # 🔍 Applique un filtre par sous-dossier
@@ -29,7 +29,7 @@ func _load_all_models() -> void:
 	models.clear()
 
 	if grid == null:
-		DialogUtils.error(get_tree().current_scene, "Grid non trouvée dans TileBrowser.")
+		DialogUtils.error(get_tree().current_scene, "Grid non trouvée dans TileBrowser")
 		return
 
 	# Nettoyage UI
@@ -51,7 +51,6 @@ func _load_all_models() -> void:
 
 	for model_path: String in models:
 		_add_model_preview(model_path)
-
 
 
 # ---------------------------------------------------------------------
@@ -81,27 +80,30 @@ func _scan_dir_recursive(path: String) -> void:
 	dir.list_dir_end()
 
 
-
 # ---------------------------------------------------------------------
 # 🧱 Ajoute un preview + label à la grille
 # ---------------------------------------------------------------------
 func _add_model_preview(model_path: String) -> void:
 	var vb := VBoxContainer.new()
 	vb.custom_minimum_size = PREVIEW_SIZE
+	vb.alignment = BoxContainer.ALIGNMENT_CENTER
 	vb.mouse_filter = Control.MOUSE_FILTER_STOP
 	vb.focus_mode = Control.FOCUS_NONE
 
 	var preview_scene: PackedScene = preload("res://scenes/editor/ModelPreview.tscn")
 	var preview: ModelPreview = preview_scene.instantiate() as ModelPreview
 	preview.model_path = model_path
+	preview.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	vb.add_child(preview)
 
 	var label := Label.new()
-	label.text = model_path.get_file().trim_suffix(".gltf").trim_suffix(".glb").trim_prefix("hex_")
+	label.custom_minimum_size = Vector2(PREVIEW_SIZE.x, 0)
+	label.text = _sanitize_model_name(model_path.get_file())
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_FILL
-	label.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
-	label.add_theme_font_size_override("font_size", 16)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	label.add_theme_font_size_override("font_size", 14)
+
 	vb.add_child(label)
 
 	vb.gui_input.connect(func(event: InputEvent) -> void:
@@ -114,3 +116,6 @@ func _add_model_preview(model_path: String) -> void:
 	)
 
 	grid.add_child(vb)
+
+func _sanitize_model_name(model_name: String) -> String:
+	return model_name.trim_suffix(".gltf").trim_suffix(".glb").trim_prefix("hex_").replace('_', ' ').replace('building', '')

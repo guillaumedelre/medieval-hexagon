@@ -34,16 +34,16 @@ func _process(delta: float) -> void:
 	var input_dir := Vector3.ZERO
 
 	# --- Déplacement ZQSD ---
-	if Input.is_action_pressed("move_forward"):  input_dir.z -= 1
+	if Input.is_action_pressed("move_forward"): input_dir.z -= 1
 	if Input.is_action_pressed("move_backward"): input_dir.z += 1
-	if Input.is_action_pressed("move_left"):     input_dir.x -= 1
-	if Input.is_action_pressed("move_right"):    input_dir.x += 1
+	if Input.is_action_pressed("move_left"): input_dir.x -= 1
+	if Input.is_action_pressed("move_right"): input_dir.x += 1
 
 	if input_dir != Vector3.ZERO:
 		pivot.translate(input_dir.normalized() * move_speed * delta)
 
 	# --- Monter / descendre ---
-	if Input.is_action_pressed("move_up"):   pivot.position.y += vertical_speed * delta
+	if Input.is_action_pressed("move_up"): pivot.position.y += vertical_speed * delta
 	if Input.is_action_pressed("move_down"): pivot.position.y -= vertical_speed * delta
 
 	# --- Rotation avec touches (Y) ---

@@ -20,7 +20,7 @@ class_name ModelPreview
 @onready var viewport: SubViewport = $SubViewportContainer/SubViewport
 @onready var holder: Node3D = $SubViewportContainer/SubViewport/Holder
 
-const PREVIEW_SCALE: float = 1    # ↙️ 3x plus petit (0.3 = 30%)
+const PREVIEW_SCALE: float = 1 # ↙️ 3x plus petit (0.3 = 30%)
 
 var model_instance: Node3D = null
 
@@ -38,7 +38,7 @@ func _process(delta: float) -> void:
 
 func _load_model(path: String) -> void:
 	if holder == null:
-		DialogUtils.error(get_tree().current_scene, "'holder' n'est pas encore initialisé, chargement différé.")
+		DialogUtils.error(get_tree().current_scene, "'holder' n'est pas encore initialisé, chargement différé")
 		call_deferred("_load_model", path)
 		return
 
@@ -58,7 +58,7 @@ func _load_model(path: String) -> void:
 	var aabb: AABB = _get_combined_aabb(inst)
 	if aabb.size != Vector3.ZERO:
 		var center: Vector3 = aabb.get_center()
-		inst.position = -center
+		inst.position = - center
 
 		var max_dim: float = maxf(aabb.size.x, maxf(aabb.size.y, aabb.size.z))
 		var scale_factor: float = (2.5 / max_dim) * PREVIEW_SCALE

@@ -64,7 +64,7 @@ func _process(delta: float) -> void:
 	_update_light_and_arrow(sun_light, sun_arrow, sun_pos)
 	_update_light_and_arrow(moon_light, moon_arrow, moon_pos)
 
-	var sun_strength : float = clamp(sun_dir.y, 0.0, 1.0)
+	var sun_strength: float = clamp(sun_dir.y, 0.0, 1.0)
 
 	# Zelda-style atmosphere
 	_update_environment(sun_strength)
@@ -187,7 +187,7 @@ func _update_environment(strength: float) -> void:
 	if env == null: return
 
 	env.ambient_light_energy = lerp(0.05, 0.25, strength)
-	env.ambient_light_color = Color(0.1,0.12,0.20).lerp(Color.WHITE, strength)
+	env.ambient_light_color = Color(0.1, 0.12, 0.20).lerp(Color.WHITE, strength)
 
 
 # ======================================================
@@ -206,9 +206,9 @@ func _update_sky(strength: float) -> void:
 
 	if mat is ProceduralSkyMaterial:
 		var p := mat as ProceduralSkyMaterial
-		p.sky_top_color = Color(0.05,0.06,0.12).lerp(Color(0.4,0.6,1.0), strength)
-		p.sky_horizon_color = Color(0.1,0.12,0.20).lerp(Color(0.5,0.7,1.0), strength)
-		p.energy_multiplier = max (0.1, strength)
+		p.sky_top_color = Color(0.05, 0.06, 0.12).lerp(Color(0.4, 0.6, 1.0), strength)
+		p.sky_horizon_color = Color(0.1, 0.12, 0.20).lerp(Color(0.5, 0.7, 1.0), strength)
+		p.energy_multiplier = max(0.1, strength)
 
 
 # ======================================================
@@ -256,7 +256,7 @@ func _update_dusk_color(sun_strength: float) -> void:
 
 	# dusk_factor = 1.0 lorsque sun_strength ≈ 0.15
 	# dusk_factor = 0.0 lorsque sun_strength = 0 ou 0.5
-	var dusk_factor : float = clamp(1.0 - abs(sun_strength - 0.15) * 6.0, 0.0, 1.0)
+	var dusk_factor: float = clamp(1.0 - abs(sun_strength - 0.15) * 6.0, 0.0, 1.0)
 
 	# Couleurs orangées façon BOTW
 	var dusk_top := Color(0.9, 0.4, 0.2)

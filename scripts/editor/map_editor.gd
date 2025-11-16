@@ -239,31 +239,14 @@ func _make_key(layer_name: String, q: int, r: int) -> String:
 # -------------------------------------------------------
 func load_map(_map_file_path: String) -> void:
 	if _map_file_path == "":
-		DialogUtils.warning(get_tree().current_scene, "load_map appelé sans chemin.")
+		DialogUtils.warning(get_tree().current_scene, "load_map appelé sans chemin")
 		return
 
-	var file := FileAccess.open(_map_file_path, FileAccess.READ)
-	if file == null:
-		DialogUtils.warning(get_tree().current_scene, "Impossible d’ouvrir la carte : %s" % _map_file_path)
-		return
+	map_data = FileManager.load_map_file(_map_file_path)
 
-	var content := file.get_as_text()
-	file.close()
-
-	var parsed: Dictionary = JSON.parse_string(content)
-	if typeof(parsed) != TYPE_DICTIONARY:
-		DialogUtils.warning(get_tree().current_scene, "Fichier de carte invalide : %s" % _map_file_path)
-		return
-
-	map_data = parsed
-
-	if map_data.has("radius"):
-		var r := int(map_data["radius"])
-		hex_grid.set_grid_radius(r)
-		$UI._on_map_loaded(map_data)
-		print("📐 Carte chargée, radius =", r)
-	else:
-		DialogUtils.warning(get_tree().current_scene, "La carte ne contient pas de champ 'radius'.")
+	hex_grid.set_grid_radius(int(map_data.radius))
+	$UI._on_map_loaded(map_data)
+	print("📐 Carte chargée, radius =", int(map_data.radius))
 
 
 func _on_close_map_button_pressed() -> void:
@@ -288,4 +271,3 @@ func _on_save_map_button_pressed() -> void:
 	}
 		
 	FileManager.save_map_file("user://maps/%s.json" % map_data.name, _map_data)
-

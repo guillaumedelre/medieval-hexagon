@@ -29,7 +29,7 @@ func create_map_file(map_radius: int, map_name: String) -> void:
 func load_map_file(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		DialogUtils.error(get_tree().current_scene, "Impossible d'ouvrir le fichier map.")
+		DialogUtils.error(get_tree().current_scene, "Impossible d'ouvrir le fichier map")
 		return {}
 	
 	var text := file.get_as_text()
@@ -37,7 +37,7 @@ func load_map_file(path: String) -> Dictionary:
 
 	var result: Dictionary = JSON.parse_string(text)
 	if result == null:
-		DialogUtils.error(get_tree().current_scene, "Fichier map invalide.")
+		DialogUtils.error(get_tree().current_scene, "Fichier map invalide")
 		return {}
 
 	return result
