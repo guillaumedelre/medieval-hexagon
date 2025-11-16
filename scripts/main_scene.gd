@@ -32,15 +32,15 @@ func _on_create_new_map_button_pressed() -> void:
 	var map_name: String = line.text.strip_edges()
 
 	if map_radius <= 0:
-		DialogUtils._show_error(get_tree().current_scene, "Le radius doit être supérieur à %d." % minimum_radius)
+		DialogUtils.error(get_tree().current_scene, "Le radius doit être supérieur à %d." % minimum_radius)
 		return
 
 	if map_name == "":
-		DialogUtils._show_error(get_tree().current_scene, "Le nom de la carte est obligatoire.")
+		DialogUtils.error(get_tree().current_scene, "Le nom de la carte est obligatoire.")
 		return
 
 	# Création du fichier
-	FileManager._create_map_file(map_radius, map_name)
+	FileManager.create_map_file(map_radius, map_name)
 
 	$WindowNewMap.hide()
 
@@ -78,7 +78,7 @@ func _on_do_open_map_button_pressed() -> void:
 	var selected := map_list.get_selected_items()
 
 	if selected.size() == 0:
-		DialogUtils._show_error(get_tree().current_scene, "Veuillez sélectionner une carte.")
+		DialogUtils.error(get_tree().current_scene, "Veuillez sélectionner une carte.")
 		return
 
 	var filename: String = map_list.get_item_text(selected[0])
@@ -94,12 +94,12 @@ func _on_do_open_map_button_pressed() -> void:
 func _open_map_scene(map_path: String) -> void:
 	var scene := load("res://scenes/editor/MapEditor.tscn") as PackedScene
 	if scene == null:
-		DialogUtils._show_error(get_tree().current_scene, "❌ Impossible de charger MapEditor.tscn")
+		DialogUtils.error(get_tree().current_scene, "❌ Impossible de charger MapEditor.tscn")
 		return
 
 	var map_editor := scene.instantiate() as MapEditor
 	if map_editor == null:
-		DialogUtils._show_error(get_tree().current_scene, "❌ La scène MapEditor n’a pas le bon script.")
+		DialogUtils.error(get_tree().current_scene, "❌ La scène MapEditor n’a pas le bon script.")
 		return
 
 	map_editor.map_file_path = map_path

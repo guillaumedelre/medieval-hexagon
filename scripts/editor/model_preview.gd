@@ -38,7 +38,7 @@ func _process(delta: float) -> void:
 
 func _load_model(path: String) -> void:
 	if holder == null:
-		push_warning("⚠️ 'holder' n'est pas encore initialisé, chargement différé.")
+		DialogUtils.error(get_tree().current_scene, "'holder' n'est pas encore initialisé, chargement différé.")
 		call_deferred("_load_model", path)
 		return
 
@@ -48,7 +48,7 @@ func _load_model(path: String) -> void:
 
 	var scene: PackedScene = load(path)
 	if scene == null:
-		push_error("⚠️ Impossible de charger le modèle : %s" % path)
+		DialogUtils.error(get_tree().current_scene, "Impossible de charger le modèle : %s" % path)
 		return
 
 	var inst: Node3D = scene.instantiate() as Node3D

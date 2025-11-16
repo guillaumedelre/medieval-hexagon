@@ -1,15 +1,20 @@
 extends Node3D
 class_name HexTile
+
 @export_enum("grass", "water", "coast", "mountain")
 var terrain_type: String = "grass"
 @export var q: int = 0
 @export var r: int = 0
+
+
 func set_terrain(t: String) -> void:
 	terrain_type = t
 	var path: String = get_model_path()
 	_load_model(path)
+
 func set_custom_model(path: String) -> void:
 	_load_model(path)
+
 func get_model_path() -> String:
 	match terrain_type:
 		"grass":
@@ -22,6 +27,7 @@ func get_model_path() -> String:
 			return "res://addons/kaykit_medieval_hexagon_pack/Assets/gltf/tiles/base/hex_grass_sloped_A.gltf"
 		_:
 			return "res://addons/kaykit_medieval_hexagon_pack/Assets/gltf/tiles/base/hex_grass.gltf"
+
 func _load_model(path: String) -> void:
 	var scene: PackedScene = load(path)
 	if scene == null:

@@ -29,7 +29,7 @@ func _load_all_models() -> void:
 	models.clear()
 
 	if grid == null:
-		push_error("❌ Grid non trouvée dans TileBrowser.")
+		DialogUtils.error(get_tree().current_scene, "Grid non trouvée dans TileBrowser.")
 		return
 
 	# Nettoyage UI
@@ -42,7 +42,7 @@ func _load_all_models() -> void:
 		base_path += "/%s" % filter_folder
 
 	if not DirAccess.dir_exists_absolute(base_path):
-		push_warning("⚠️ Dossier introuvable : %s" % base_path)
+		DialogUtils.warning(get_tree().current_scene, "Dossier introuvable : %s" % base_path)
 		return
 
 	_scan_dir_recursive(base_path)

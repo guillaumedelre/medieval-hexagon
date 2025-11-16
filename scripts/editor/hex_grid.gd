@@ -97,7 +97,7 @@ func _generate_collision_mesh() -> void:
 
 	var col_mesh: ArrayMesh = st.commit() as ArrayMesh
 	if col_mesh == null:
-		push_warning("HexGrid: échec génération mesh de collision")
+		DialogUtils.warning(get_tree().current_scene, "HexGrid: échec génération mesh de collision.")
 		return
 
 	var faces: PackedVector3Array = col_mesh.get_faces()

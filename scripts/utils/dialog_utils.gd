@@ -10,7 +10,19 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 
-func _show_error(scene: Control, msg: String) -> void:
+func error(scene: Node, msg: String) -> void:
+	message(scene, "❌ " + msg)
+
+func warning(scene: Node, msg: String) -> void:
+	message(scene, "⚠️ " + msg)
+
+func success(scene: Node, msg: String) -> void:
+	message(scene, "✅ " + msg)
+
+func info(scene: Node, msg: String) -> void:
+	message(scene, "ℹ️ " + msg)
+
+func message(scene: Node, msg: String) -> void:
 	var dlg := AcceptDialog.new()
 	dlg.dialog_text = msg
 	scene.add_child(dlg)

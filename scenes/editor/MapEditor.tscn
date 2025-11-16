@@ -231,4 +231,6 @@ tab_2/title = "Decorations"
 layout_mode = 2
 size_flags_vertical = 3
 
+[connection signal="pressed" from="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer4/SaveMapButton" to="." method="_on_save_map_button_pressed"]
+[connection signal="pressed" from="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer4/CloseMapButton" to="." method="_on_close_map_button_pressed"]
 [connection signal="tab_changed" from="UI/VBoxContainer/FoldableTiles/VBoxContainer/LayerTabBar" to="UI" method="_on_layer_tab_bar_tab_changed"]

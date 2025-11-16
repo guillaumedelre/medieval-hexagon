@@ -1,7 +1,7 @@
 extends Node3D
 class_name MapEditor
 
-@export var map_file_path: String = ""    # ← chemin de la carte (user://maps/xxx.json)
+@export var map_file_path: String = "" # ← chemin de la carte (user://maps/xxx.json)
 
 @onready var tile_browser: TileBrowser = $UI/VBoxContainer/FoldableTiles/VBoxContainer/TileBrowser
 @onready var layer_tab_bar: TabBar = $UI/VBoxContainer/FoldableTiles/VBoxContainer/LayerTabBar
@@ -18,7 +18,7 @@ var current_model_path: String = ""
 var map_name: String = ""
 var tiles: Dictionary = {} # clé: layer:q:r
 var ghost_rotation_deg: float = 0.0
-
+var map_data: Dictionary
 
 func _ready() -> void:
 	current_layer = terrain_layer
@@ -27,7 +27,7 @@ func _ready() -> void:
 		tile_browser.model_selected.connect(Callable(self, "_on_model_selected"))
 
 	if not $UI.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
-		$UI.layer_changed.connect(Callable(self, "_on_layer_changed"))	
+		$UI.layer_changed.connect(Callable(self, "_on_layer_changed"))
 		# Simule un clic sur "Terrain" au démarrage
 		layer_tab_bar.current_tab = 0
 		layer_tab_bar.emit_signal("tab_changed", 0)
@@ -55,7 +55,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if ghost_tile:
 				ghost_tile.visible = false
 				ghost_tile.rotation.y = 0.0
-			return  # empêcher les autres actions
+			return # empêcher les autres actions
 	
 	if event is InputEventMouseButton and event.pressed:
 		# Empêcher les clics pendant que la souris est sur l’UI
@@ -96,7 +96,7 @@ func _on_layer_changed(layer_name: String) -> void:
 			current_layer = resource_layer
 			tile_browser.set_filter("decoration")
 		_:
-			push_warning("⚠️ Layer inconnu : %s" % layer_name)
+			DialogUtils.warning(get_tree().current_scene, "Layer inconnu : %s" % layer_name)
 			
 	# 🔥 Réinitialisation du modèle actif et du ghost
 	current_model_path = ""
@@ -152,7 +152,7 @@ func _update_highlight() -> void:
 			ghost_tile.visible = false
 		return
 
-	var hit_pos : Vector3 = result.position
+	var hit_pos: Vector3 = result.position
 	var axial := HexMath.world_to_axial(hit_pos)
 	var q := int(axial.x)
 	var r := int(axial.y)
@@ -194,7 +194,7 @@ func _place_tile_from_mouse() -> void:
 
 	var scene: PackedScene = load(current_model_path)
 	if scene == null:
-		push_warning("⚠️ Impossible de charger :", current_model_path)
+		DialogUtils.warning(get_tree().current_scene, "Impossible de charger :" % current_model_path)
 		return
 
 	var inst: Node3D = scene.instantiate()
@@ -239,23 +239,23 @@ func _make_key(layer_name: String, q: int, r: int) -> String:
 # -------------------------------------------------------
 func load_map(_map_file_path: String) -> void:
 	if _map_file_path == "":
-		push_warning("⚠️ load_map appelé sans chemin.")
+		DialogUtils.warning(get_tree().current_scene, "load_map appelé sans chemin.")
 		return
 
 	var file := FileAccess.open(_map_file_path, FileAccess.READ)
 	if file == null:
-		push_warning("❌ Impossible d’ouvrir la carte : %s" % _map_file_path)
+		DialogUtils.warning(get_tree().current_scene, "Impossible d’ouvrir la carte : %s" % _map_file_path)
 		return
 
 	var content := file.get_as_text()
 	file.close()
 
-	var parsed : Dictionary = JSON.parse_string(content)
+	var parsed: Dictionary = JSON.parse_string(content)
 	if typeof(parsed) != TYPE_DICTIONARY:
-		push_warning("❌ Fichier de carte invalide : %s" % _map_file_path)
+		DialogUtils.warning(get_tree().current_scene, "Fichier de carte invalide : %s" % _map_file_path)
 		return
 
-	var map_data: Dictionary = parsed
+	map_data = parsed
 
 	if map_data.has("radius"):
 		var r := int(map_data["radius"])
@@ -263,4 +263,29 @@ func load_map(_map_file_path: String) -> void:
 		$UI._on_map_loaded(map_data)
 		print("📐 Carte chargée, radius =", r)
 	else:
-		push_warning("ℹ️ La carte ne contient pas de champ 'radius'.")
+		DialogUtils.warning(get_tree().current_scene, "La carte ne contient pas de champ 'radius'.")
+
+
+func _on_close_map_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/MainScene.tscn")
+
+func _on_save_map_button_pressed() -> void:
+	var _tiles: Array = []
+	for tile_key in tiles.keys():
+		var tile_parts: Array = tile_key.split(":")
+		_tiles.append({
+			"layer": tile_parts[0],
+			"q": tile_parts[1],
+			"r": tile_parts[2],
+			"orientation": int(rad_to_deg(tiles[tile_key].rotation.y)),
+			"model": tiles[tile_key].get_children()[0].mesh.resource_name,
+		})
+	var _map_data: Dictionary = {
+		"version": 1,
+		"name": map_data.name,
+		"radius": map_data.radius,
+		"tiles": _tiles,
+	}
+		
+	FileManager.save_map_file("user://maps/%s.json" % map_data.name, _map_data)
+

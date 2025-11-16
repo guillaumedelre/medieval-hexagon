@@ -39,11 +39,11 @@ func _cube_round(x: float, y: float, z: float) -> Vector2:
 	var z_diff: float = abs(rz - z)
 
 	if x_diff > y_diff and x_diff > z_diff:
-		rx = -ry - rz
+		rx = - ry - rz
 	elif y_diff > z_diff:
-		ry = -rx - rz
+		ry = - rx - rz
 	else:
-		rz = -rx - ry
+		rz = - rx - ry
 
 	# Conversion finale en entiers proprement typés
 	return Vector2(int(rx), int(rz))
