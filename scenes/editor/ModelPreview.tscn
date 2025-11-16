@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://b3xccynio75cf"]
 
-[ext_resource type="Script" uid="uid://dv2qmwmv8e3ub" path="res://scripts/model_preview.gd" id="1_sxtel"]
+[ext_resource type="Script" uid="uid://dv2qmwmv8e3ub" path="res://scripts/editor/model_preview.gd" id="1_sxtel"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sxtel"]
 

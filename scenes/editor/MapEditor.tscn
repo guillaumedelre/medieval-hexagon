@@ -1,0 +1,234 @@
+[gd_scene load_steps=9 format=3 uid="uid://bmvl0mmvq2xrt"]
+
+[ext_resource type="Script" uid="uid://b4bjbpkgyull3" path="res://scripts/editor/map_editor.gd" id="1_fxgqh"]
+[ext_resource type="Script" uid="uid://bhfxbci4dpeyx" path="res://scripts/editor/camera_controller.gd" id="2_rwdrj"]
+[ext_resource type="PackedScene" uid="uid://c1j0jj480jij5" path="res://scenes/editor/HexGrid.tscn" id="2_y6um0"]
+[ext_resource type="PackedScene" uid="uid://bo6ei0t8ag4st" path="res://scenes/editor/GhostTile.tscn" id="3_cio15"]
+[ext_resource type="Environment" uid="uid://dj268r1axdpa0" path="res://default_env.tres" id="4_rwdrj"]
+[ext_resource type="Script" uid="uid://cjyftpvgtwe1q" path="res://scripts/editor/ui.gd" id="7_0d0we"]
+[ext_resource type="PackedScene" uid="uid://cp32jgyyj222g" path="res://scenes/editor/TileBrowser.tscn" id="7_y6um0"]
+[ext_resource type="Script" uid="uid://dsmaugvoqml4p" path="res://scripts/editor/day_night_cycle.gd" id="10_sa2v6"]
+
+[node name="MapEditor" type="Node3D" groups=["terrain_generator"]]
+script = ExtResource("1_fxgqh")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot" groups=["main_camera"]]
+script = ExtResource("2_rwdrj")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("4_rwdrj")
+
+[node name="DayNightCycle" type="Node3D" parent="." node_paths=PackedStringArray("sun_pivot", "moon_pivot", "world_env")]
+script = ExtResource("10_sa2v6")
+sun_pivot = NodePath("SunPivot")
+moon_pivot = NodePath("MoonPivot")
+world_env = NodePath("../WorldEnvironment")
+
+[node name="SunPivot" type="Node3D" parent="DayNightCycle"]
+
+[node name="MoonPivot" type="Node3D" parent="DayNightCycle"]
+
+[node name="Layers" type="Node3D" parent="."]
+
+[node name="TerrainLayer" type="Node3D" parent="Layers"]
+
+[node name="BuildingLayer" type="Node3D" parent="Layers"]
+
+[node name="ResourceLayer" type="Node3D" parent="Layers"]
+
+[node name="HexGrid" parent="." instance=ExtResource("2_y6um0")]
+
+[node name="GhostTile" parent="." instance=ExtResource("3_cio15")]
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_0d0we")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="FoldableMap" type="FoldableContainer" parent="UI/VBoxContainer"]
+layout_mode = 2
+folded = true
+title = "Map"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/VBoxContainer/FoldableMap"]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer/FoldableMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="MapNameLabel" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name"
+
+[node name="MapNameValue" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/VBoxContainer/FoldableMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="MapRadiusLabel" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Radius"
+
+[node name="MapRadiusValue" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="UI/VBoxContainer/FoldableMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="MapGridLabel" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Grid"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MapGridQValue" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="MapGridRValue" type="Label" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="UI/VBoxContainer/FoldableMap/VBoxContainer"]
+layout_mode = 2
+
+[node name="SaveMapButton" type="Button" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save"
+
+[node name="CloseMapButton" type="Button" parent="UI/VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"
+
+[node name="FoldableMinimap" type="FoldableContainer" parent="UI/VBoxContainer"]
+layout_mode = 2
+folded = true
+title = "Minimap"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/VBoxContainer/FoldableMinimap"]
+visible = false
+layout_mode = 2
+
+[node name="MinimapPanel" type="Panel" parent="UI/VBoxContainer/FoldableMinimap/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="FoldableCamera" type="FoldableContainer" parent="UI/VBoxContainer"]
+layout_mode = 2
+folded = true
+title = "Camera"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/VBoxContainer/FoldableCamera"]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainerX" type="HBoxContainer" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer"]
+layout_mode = 2
+
+[node name="XCameraLabel" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerX"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "x"
+
+[node name="XCameraValue" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerX"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="HBoxContainerZ" type="HBoxContainer" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer"]
+layout_mode = 2
+
+[node name="ZCameraLabel" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerZ"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "z"
+
+[node name="ZCameraValue" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerZ"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="HBoxContainerY" type="HBoxContainer" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer"]
+layout_mode = 2
+
+[node name="YCameraLabel" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerY"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "y"
+
+[node name="YCameraValue" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerY"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="FoldableTiles" type="FoldableContainer" parent="UI/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+title = "Tiles"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/VBoxContainer/FoldableTiles"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer/FoldableTiles/VBoxContainer"]
+layout_mode = 2
+
+[node name="TileLayerLabel" type="Label" parent="UI/VBoxContainer/FoldableTiles/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Layer"
+
+[node name="TileLayerValue" type="Label" parent="UI/VBoxContainer/FoldableTiles/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="LayerTabBar" type="TabBar" parent="UI/VBoxContainer/FoldableTiles/VBoxContainer"]
+layout_mode = 2
+current_tab = 0
+tab_count = 3
+tab_0/title = "Terrain"
+tab_1/title = "Buildings"
+tab_2/title = "Decorations"
+
+[node name="TileBrowser" parent="UI/VBoxContainer/FoldableTiles/VBoxContainer" instance=ExtResource("7_y6um0")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="tab_changed" from="UI/VBoxContainer/FoldableTiles/VBoxContainer/LayerTabBar" to="UI" method="_on_layer_tab_bar_tab_changed"]

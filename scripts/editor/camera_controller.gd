@@ -62,7 +62,7 @@ func _process(delta: float) -> void:
 	if global_position != _last_position or rotation != _last_rotation:
 		_last_position = global_position
 		_last_rotation = rotation
-		emit_signal("camera_moved", global_position, rotation)
+		emit_signal("camera_moved", global_position)
 
 # -------------------------------------------------------------------------
 #  Entrées utilisateur (molette, clic molette)

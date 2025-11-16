@@ -1,6 +1,6 @@
 extends Node
 
-@onready var dialog_utils := preload("res://scripts/dialog_utils.gd").new()
+@onready var dialog_utils := preload("res://scripts/utils/dialog_utils.gd").new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

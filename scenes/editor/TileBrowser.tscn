@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cp32jgyyj222g"]
 
-[ext_resource type="Script" uid="uid://cygh6p8vxmes8" path="res://scripts/tile_browser.gd" id="1"]
+[ext_resource type="Script" uid="uid://cygh6p8vxmes8" path="res://scripts/editor/tile_browser.gd" id="1"]
 
 [node name="TileBrowser" type="Control"]
 layout_mode = 3
@@ -27,4 +27,3 @@ anchor_bottom = 1.0
 
 [node name="Grid" type="GridContainer" parent="Panel/Scroll"]
 layout_mode = 2
-columns = 6

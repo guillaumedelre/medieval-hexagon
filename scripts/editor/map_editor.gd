@@ -3,8 +3,8 @@ class_name MapEditor
 
 @export var map_file_path: String = ""    # ← chemin de la carte (user://maps/xxx.json)
 
-@onready var tile_browser: TileBrowser = $UI/VBoxContainer/TileBrowser
-@onready var layer_selector: LayerSelector = $UI/VBoxContainer/LayerSelector
+@onready var tile_browser: TileBrowser = $UI/VBoxContainer/FoldableTiles/VBoxContainer/TileBrowser
+@onready var layer_tab_bar: TabBar = $UI/VBoxContainer/FoldableTiles/VBoxContainer/LayerTabBar
 @onready var hex_grid: HexGrid = $HexGrid
 @onready var ghost_tile: GhostTile = $GhostTile
 @onready var camera: Camera3D = $CameraPivot/Camera3D
@@ -16,22 +16,21 @@ var current_layer: Node3D
 var current_layer_name: String = ""
 var current_model_path: String = ""
 var map_name: String = ""
-var math: HexMath
 var tiles: Dictionary = {} # clé: layer:q:r
 var ghost_rotation_deg: float = 0.0
 
 
 func _ready() -> void:
 	current_layer = terrain_layer
-	math = preload("res://scripts/hex_math.gd").new()
 
 	if tile_browser and not tile_browser.is_connected("model_selected", Callable(self, "_on_model_selected")):
 		tile_browser.model_selected.connect(Callable(self, "_on_model_selected"))
 
-	if layer_selector and not layer_selector.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
-		layer_selector.layer_changed.connect(Callable(self, "_on_layer_changed"))
+	if not $UI.is_connected("layer_changed", Callable(self, "_on_layer_changed")):
+		$UI.layer_changed.connect(Callable(self, "_on_layer_changed"))	
 		# Simule un clic sur "Terrain" au démarrage
-		layer_selector.get_node("HBoxContainer/TerrainButton").emit_signal("pressed")
+		layer_tab_bar.current_tab = 0
+		layer_tab_bar.emit_signal("tab_changed", 0)
 
 	# Si un fichier de carte est défini → on le charge
 	if map_file_path != "":
@@ -85,7 +84,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_layer_changed(layer_name: String) -> void:
 	current_layer_name = layer_name
-
+	$UI/VBoxContainer/FoldableTiles/VBoxContainer/HBoxContainer/TileLayerValue.text = current_layer_name
 	match layer_name:
 		"terrain":
 			current_layer = terrain_layer
@@ -154,12 +153,12 @@ func _update_highlight() -> void:
 		return
 
 	var hit_pos : Vector3 = result.position
-	var axial := math.world_to_axial(hit_pos)
+	var axial := HexMath.world_to_axial(hit_pos)
 	var q := int(axial.x)
 	var r := int(axial.y)
 
 	hex_grid.highlight(q, r)
-	var world_pos := math.axial_to_world(q, r)
+	var world_pos := HexMath.axial_to_world(q, r)
 
 	# Ghost
 	if ghost_tile:
@@ -184,7 +183,7 @@ func _place_tile_from_mouse() -> void:
 	if hit.is_empty():
 		return
 	
-	var axial := math.world_to_axial(hit.position)
+	var axial := HexMath.world_to_axial(hit.position)
 	var q := int(axial.x)
 	var r := int(axial.y)
 
@@ -199,7 +198,7 @@ func _place_tile_from_mouse() -> void:
 		return
 
 	var inst: Node3D = scene.instantiate()
-	inst.position = math.axial_to_world(q, r)
+	inst.position = HexMath.axial_to_world(q, r)
 
 	# 🔥 AJOUT : applique la rotation du GhostTile si présent
 	if ghost_tile:
@@ -216,7 +215,7 @@ func _remove_tile_from_mouse() -> void:
 	if hit.is_empty():
 		return
 
-	var axial := math.world_to_axial(hit.position)
+	var axial := HexMath.world_to_axial(hit.position)
 	var q := int(axial.x)
 	var r := int(axial.y)
 
@@ -261,7 +260,7 @@ func load_map(_map_file_path: String) -> void:
 	if map_data.has("radius"):
 		var r := int(map_data["radius"])
 		hex_grid.set_grid_radius(r)
-		$UI/TopBar/LabelMap.text = map_data["name"]
+		$UI._on_map_loaded(map_data)
 		print("📐 Carte chargée, radius =", r)
 	else:
 		push_warning("ℹ️ La carte ne contient pas de champ 'radius'.")

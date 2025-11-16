@@ -7,14 +7,11 @@ class_name HexGrid
 @export var grid_radius: int = 40                  # rayon de la grille (axial)
 @export var tile_size: float = 1.1547              # taille d’un hex
 @export var outline_color: Color = Color(1, 1, 1, 0.01)
-
-var mm: MultiMesh                                  # MultiMesh visuel
-
 @onready var mm_instance: MultiMeshInstance3D = $Visual
 @onready var collider: StaticBody3D = $Collider
 @onready var coll_shape: CollisionShape3D = $Collider/CollisionShape
 
-var math := preload("res://scripts/hex_math.gd").new()
+var mm: MultiMesh                                  # MultiMesh visuel
 
 
 # -------------------------------------------------------------------
@@ -22,7 +19,7 @@ var math := preload("res://scripts/hex_math.gd").new()
 # -------------------------------------------------------------------
 func _ready() -> void:
 	# On synchronise la taille des tuiles entre la grille et les maths
-	math.TILE_SIZE = tile_size
+	HexMath.TILE_SIZE = tile_size
 	_regenerate()
 
 
@@ -75,7 +72,7 @@ func _generate_visual_mesh() -> void:
 		var cell: Vector2 = c as Vector2
 		var q: int = int(cell.x)
 		var r: int = int(cell.y)
-		var pos: Vector3 = math.axial_to_world(q, r)
+		var pos: Vector3 = HexMath.axial_to_world(q, r)
 		mm.set_instance_transform(i, Transform3D(Basis(), pos))
 		i += 1
 
@@ -95,7 +92,7 @@ func _generate_collision_mesh() -> void:
 		var cell: Vector2 = c as Vector2
 		var q: int = int(cell.x)
 		var r: int = int(cell.y)
-		var center: Vector3 = math.axial_to_world(q, r)
+		var center: Vector3 = HexMath.axial_to_world(q, r)
 		_add_hex_collision(st, center, tile_size)
 
 	var col_mesh: ArrayMesh = st.commit() as ArrayMesh
@@ -130,7 +127,7 @@ func _create_hex_outline_mesh(size: float) -> Mesh:
 	st.begin(Mesh.PRIMITIVE_LINE_STRIP)
 
 	for i in range(7):
-		var corner: Vector3 = math.hex_corner(size, i % 6)
+		var corner: Vector3 = HexMath.hex_corner(size, i % 6)
 		st.set_color(outline_color) # alpha respecté via matériau
 		st.add_vertex(corner)
 
@@ -157,7 +154,7 @@ func _add_hex_collision(st: SurfaceTool, center: Vector3, size: float) -> void:
 	var pts: Array[Vector3] = []
 
 	for i in range(6):
-		var local_corner: Vector3 = math.hex_corner(size, i)
+		var local_corner: Vector3 = HexMath.hex_corner(size, i)
 		pts.append(center + local_corner)
 
 	# 4 triangles plats pour former un hexagone

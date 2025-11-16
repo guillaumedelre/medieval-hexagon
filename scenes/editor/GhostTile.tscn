@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bo6ei0t8ag4st"]
 
-[ext_resource type="Script" uid="uid://dyi1olofc8lr7" path="res://scripts/ghost_tile.gd" id="1_xwpfo"]
+[ext_resource type="Script" uid="uid://dyi1olofc8lr7" path="res://scripts/editor/ghost_tile.gd" id="1_xwpfo"]
 
 [node name="GhostTile" type="Node3D"]
 script = ExtResource("1_xwpfo")

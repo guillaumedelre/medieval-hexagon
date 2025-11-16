@@ -16,8 +16,9 @@ config/features=PackedStringArray("4.5")
 
 [autoload]
 
-FileManager="*res://scripts/file_manager.gd"
-DialogUtils="*res://scripts/dialog_utils.gd"
+FileManager="*res://scripts/utils/file_manager.gd"
+DialogUtils="*res://scripts/utils/dialog_utils.gd"
+HexMath="*res://scripts/utils/hex_math.gd"
 
 [display]
 

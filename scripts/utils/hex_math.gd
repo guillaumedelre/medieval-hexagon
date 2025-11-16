@@ -1,5 +1,4 @@
 extends Node
-class_name HexMath
 
 @export var TILE_SIZE: float = 1.0
 

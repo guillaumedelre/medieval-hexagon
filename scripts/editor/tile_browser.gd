@@ -91,7 +91,7 @@ func _add_model_preview(model_path: String) -> void:
 	vb.mouse_filter = Control.MOUSE_FILTER_STOP
 	vb.focus_mode = Control.FOCUS_NONE
 
-	var preview_scene: PackedScene = preload("res://scenes/ModelPreview.tscn")
+	var preview_scene: PackedScene = preload("res://scenes/editor/ModelPreview.tscn")
 	var preview: ModelPreview = preview_scene.instantiate() as ModelPreview
 	preview.model_path = model_path
 	vb.add_child(preview)
