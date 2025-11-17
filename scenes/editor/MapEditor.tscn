@@ -25,6 +25,7 @@ script = ExtResource("10_sa2v6")
 sun_pivot = NodePath("SunPivot")
 moon_pivot = NodePath("MoonPivot")
 world_env = NodePath("../WorldEnvironment")
+day_length_seconds = 60.0
 
 [node name="SunPivot" type="Node3D" parent="DayNightCycle"]
 
@@ -193,6 +194,42 @@ size_flags_horizontal = 3
 text = "y"
 
 [node name="YCameraValue" type="Label" parent="UI/VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerY"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="FoldableDayTime" type="FoldableContainer" parent="UI/VBoxContainer"]
+layout_mode = 2
+folded = true
+title = "Day Time"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/VBoxContainer/FoldableDayTime"]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainerMoment" type="HBoxContainer" parent="UI/VBoxContainer/FoldableDayTime/VBoxContainer"]
+layout_mode = 2
+
+[node name="MomentLabel" type="Label" parent="UI/VBoxContainer/FoldableDayTime/VBoxContainer/HBoxContainerMoment"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Moment"
+
+[node name="MomentValue" type="Label" parent="UI/VBoxContainer/FoldableDayTime/VBoxContainer/HBoxContainerMoment"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "test"
+
+[node name="HBoxContainerTime" type="HBoxContainer" parent="UI/VBoxContainer/FoldableDayTime/VBoxContainer"]
+layout_mode = 2
+
+[node name="TimeLabel" type="Label" parent="UI/VBoxContainer/FoldableDayTime/VBoxContainer/HBoxContainerTime"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Time"
+
+[node name="TimeValue" type="Label" parent="UI/VBoxContainer/FoldableDayTime/VBoxContainer/HBoxContainerTime"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "test"
