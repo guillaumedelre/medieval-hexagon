@@ -9,24 +9,23 @@ class_name DayNightCycle
 # 🎯 Centre de la grille (ex: axial_to_world(0,0))
 @export var grid_center: Vector3 = Vector3.ZERO
 
-@export var day_length_seconds := 120.0
+@export var day_length_seconds := 180.0
 
 # Astres
 const SUN_SIZE := 100.0
 const MOON_SIZE := 10.0
 const ORBIT_RADIUS := 5000.0
+const NO_SHADOW_LAYER := 99
 
 var time := 0.25
 
 # Soleil
 var sun_mesh: MeshInstance3D
 var sun_light: DirectionalLight3D
-var sun_arrow: Node3D
 
 # Lune
 var moon_mesh: MeshInstance3D
 var moon_light: DirectionalLight3D
-var moon_arrow: Node3D
 
 
 # ======================================================
@@ -61,8 +60,8 @@ func _process(delta: float) -> void:
 	sun_pivot.global_position = sun_pos
 	moon_pivot.global_position = moon_pos
 
-	_update_light_and_arrow(sun_light, sun_arrow, sun_pos)
-	_update_light_and_arrow(moon_light, moon_arrow, moon_pos)
+	_update_light(sun_light, sun_pos)
+	_update_light(moon_light, moon_pos)
 
 	var sun_strength: float = clamp(sun_dir.y, 0.0, 1.0)
 
@@ -77,12 +76,9 @@ func _process(delta: float) -> void:
 # ======================================================
 # UPDATE LIGHTS + ARROWS
 # ======================================================
-func _update_light_and_arrow(_light: DirectionalLight3D, _arrow: Node3D, _pos: Vector3) -> void:
+func _update_light(_light: DirectionalLight3D, _pos: Vector3) -> void:
 	_light.global_position = _pos
 	_light.look_at(grid_center, Vector3.UP)
-
-	#var dir := -_light.global_transform.basis.z.normalized()
-	#_arrow.global_transform = Transform3D(Basis.looking_at(dir, Vector3.UP), _arrow.global_position)
 
 
 # ======================================================
@@ -93,6 +89,8 @@ func _create_sun() -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = SUN_SIZE
 	sun_mesh.mesh = sphere
+	# empeche la projection de l'ombre de la sphere sur le sol
+	sun_mesh.layers = 1 << NO_SHADOW_LAYER
 
 	sun_mesh.material_override = _make_emissive(Color(1.2, 1.1, 0.6), 3.0)
 	sun_mesh.material_override.no_depth_test = true
@@ -101,12 +99,12 @@ func _create_sun() -> void:
 
 	sun_light = DirectionalLight3D.new()
 	sun_light.name = "SunLight"
-	sun_light.light_energy = 2.5
+	sun_light.light_energy = 1.0
 	sun_light.shadow_enabled = true
-	sun_mesh.add_child(sun_light)
+	sun_light.shadow_blur = 5.0
+	sun_light.light_cull_mask = ~ (1 << NO_SHADOW_LAYER)
 
-	#sun_arrow = _create_arrow(Color(1.0, 0.8, 0.2))
-	#sun_mesh.add_child(sun_arrow)
+	sun_mesh.add_child(sun_light)
 
 
 # ======================================================
@@ -117,6 +115,8 @@ func _create_moon() -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = MOON_SIZE
 	moon_mesh.mesh = sphere
+	# empeche la projection de l'ombre de la sphere sur le sol
+	moon_mesh.layers = 1 << NO_SHADOW_LAYER
 
 	moon_mesh.material_override = _make_emissive(Color(0.7, 0.8, 1.0), 1.0)
 	moon_mesh.material_override.no_depth_test = true
@@ -125,45 +125,12 @@ func _create_moon() -> void:
 
 	moon_light = DirectionalLight3D.new()
 	moon_light.name = "MoonLight"
-	moon_light.light_energy = 0.5
+	moon_light.light_energy = 0.2
 	moon_light.shadow_enabled = true
+	moon_light.shadow_blur = 5.0
+	moon_light.light_cull_mask = ~ (1 << NO_SHADOW_LAYER)
+
 	moon_mesh.add_child(moon_light)
-
-	#moon_arrow = _create_arrow(Color(1.0, 1.0, 1.0, 1.0))
-	#moon_mesh.add_child(moon_arrow)
-
-
-# ======================================================
-# ARROW CREATION
-# ======================================================
-func _create_arrow(color: Color) -> Node3D:
-	var root := Node3D.new()
-
-	var cyl := CylinderMesh.new()
-	cyl.height = 200.0
-	cyl.top_radius = 8.0
-	cyl.bottom_radius = 8.0
-
-	var body := MeshInstance3D.new()
-	body.mesh = cyl
-	body.material_override = _make_emissive(color, 1.2)
-	body.rotation_degrees = Vector3(-90, 0, 0)
-	body.position = Vector3(0, 0, -100)
-	root.add_child(body)
-
-	var cone := CylinderMesh.new()
-	cone.height = 80.0
-	cone.top_radius = 0.0
-	cone.bottom_radius = 20.0
-
-	var tip := MeshInstance3D.new()
-	tip.mesh = cone
-	tip.material_override = _make_emissive(color, 1.5)
-	tip.rotation_degrees = Vector3(-90, 0, 0)
-	tip.position = Vector3(0, 0, -200)
-	root.add_child(tip)
-
-	return root
 
 
 # ======================================================
@@ -258,16 +225,20 @@ func _update_dusk_color(sun_strength: float) -> void:
 	# dusk_factor = 0.0 lorsque sun_strength = 0 ou 0.5
 	var dusk_factor: float = clamp(1.0 - abs(sun_strength - 0.15) * 6.0, 0.0, 1.0)
 
-	# Couleurs orangées façon BOTW
+	# 🌤 Couleurs "jour" (base)
+	var normal_top := Color(0.4, 0.6, 1.0)
+	var normal_horizon := Color(0.5, 0.7, 1.0)
+
+	# 🌇 Couleurs crépuscule
 	var dusk_top := Color(0.9, 0.4, 0.2)
 	var dusk_horizon := Color(1.0, 0.55, 0.25)
 
-	# Mélange sky normal → sky crépuscule
-	p.sky_top_color = p.sky_top_color.lerp(dusk_top, dusk_factor * 0.8)
-	p.sky_horizon_color = p.sky_horizon_color.lerp(dusk_horizon, dusk_factor)
+	# Blend sky → dusk
+	p.sky_top_color = normal_top.lerp(dusk_top, dusk_factor * 0.8)
+	p.sky_horizon_color = normal_horizon.lerp(dusk_horizon, dusk_factor)
 
 	# Option : renforcer l’horizon en bas
-	p.ground_horizon_color = Color(0.8, 0.4, 0.3).lerp(Color(0.3, 0.3, 0.3), dusk_factor)
+	#p.ground_horizon_color = Color(0.8, 0.4, 0.3).lerp(Color(0.3, 0.3, 0.3), dusk_factor)
 
 
 # ======================================================

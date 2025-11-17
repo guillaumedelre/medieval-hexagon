@@ -144,3 +144,5 @@ rotate_ghost_horary={
 
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=5
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=5
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=5
+anti_aliasing/quality/use_taa=true
