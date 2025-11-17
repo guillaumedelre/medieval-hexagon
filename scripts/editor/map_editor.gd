@@ -243,11 +243,57 @@ func load_map(_map_file_path: String) -> void:
 		return
 
 	map_data = FileManager.load_map_file(_map_file_path)
+	for i in map_data.tiles.size():
+		var _tile = map_data.tiles[i]
+		var model_path: String = find_file_in_tree("res://addons/kaykit_medieval_hexagon_pack/Assets/gltf", _tile.model)
+		var layer: Node3D = null
+		match _tile.layer:
+			"terrain":
+				layer = $Layers/TerrainLayer
+			"building":
+				layer = $Layers/BuildingLayer
+			"resource":
+				layer = $Layers/ResourceLayer
+			_:
+				layer = $Layers/TerrainLayer
+		
+		var scene: PackedScene = load(model_path)
+		if scene == null:
+			DialogUtils.warning(get_tree().current_scene, "Impossible de charger :" % model_path)
+			return
+
+		var inst: Node3D = scene.instantiate()
+		inst.position = HexMath.axial_to_world(int(_tile.q), int(_tile.r))
+		inst.rotation.y = deg_to_rad(int(_tile.orientation))
+		layer.add_child(inst)
+		var key := _make_key(_tile.layer, int(_tile.q), int(_tile.r))
+		tiles[key] = inst
+		await get_tree().process_frame
 
 	hex_grid.set_grid_radius(int(map_data.radius))
 	$UI._on_map_loaded(map_data)
 	print("📐 Carte chargée, radius =", int(map_data.radius))
 
+
+
+func find_file_in_tree(root_path: String, model_name: String) -> String:
+	var target_name = model_name + ".gltf"
+	var dir: DirAccess = DirAccess.open(root_path)
+	if dir == null:
+		push_error("Le dossier %s est introuvable." % root_path)
+		return ""
+
+	for entry in dir.get_directories():
+		var sub_path: String = "%s/%s" % [root_path, entry]
+		var result: String = find_file_in_tree(sub_path, model_name)
+		if result != "":
+			return result
+
+	for file in dir.get_files():
+		if file.get_file() == target_name:
+			return "%s/%s" % [root_path, file]
+
+	return ""	
 
 func _on_close_map_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/MainScene.tscn")
@@ -261,7 +307,7 @@ func _on_save_map_button_pressed() -> void:
 			"q": tile_parts[1],
 			"r": tile_parts[2],
 			"orientation": int(rad_to_deg(tiles[tile_key].rotation.y)),
-			"model": tiles[tile_key].get_children()[0].mesh.resource_name,
+			"model": tiles[tile_key].get_children()[0].mesh.resource_path.get_file().get_basename(),
 		})
 	var _map_data: Dictionary = {
 		"version": 1,

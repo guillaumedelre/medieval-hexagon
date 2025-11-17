@@ -15,7 +15,6 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if camera == null:
 		_find_main_camera()
-		print(camera)
 		if camera == null:
 			print("⚠️ No camera")
 			return
@@ -39,7 +38,6 @@ func _on_camera_moved(_position: Vector3) -> void:
 	$VBoxContainer/FoldableCamera/VBoxContainer/HBoxContainerY/YCameraValue.text = "️%.1f" % _position.y
 
 func _on_map_loaded(map_data: Dictionary) -> void:
-	print(map_data)
 	$VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer/MapNameValue.text = map_data['name']
 	$VBoxContainer/FoldableMap/VBoxContainer/HBoxContainer2/MapRadiusValue.text = str(int(map_data['radius']))
 

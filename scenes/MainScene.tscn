@@ -53,7 +53,7 @@ text = "Multi"
 [node name="EditorFold" type="FoldableContainer" parent="VBoxContainer"]
 layout_mode = 2
 folded = true
-title = "Editeur"
+title = "Editor"
 title_alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/EditorFold"]
