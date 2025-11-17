@@ -8,13 +8,15 @@ class_name DayNightCycle
 @export var grid_center: Vector3 = Vector3.ZERO
 @export var day_length_seconds: float = 180.0
 
+
+const ORBIT_RADIUS := 1000.0
+
 var time: float = 0.0 # 0 = minuit, 0.5 = midi
-
-const ORBIT_RADIUS := 5000.0
-
 var sun_light: DirectionalLight3D
 var moon_light: DirectionalLight3D
 var sky_material: ShaderMaterial
+var debug_sun_line: MeshInstance3D
+var debug_moon_line: MeshInstance3D
 
 func _ready() -> void:
 	print("🌍 DayNightCycle Initialized")
@@ -40,7 +42,6 @@ func _ready() -> void:
 		push_warning("⚠️ Aucun Sky trouvé dans l'Environment.")
 		return
 
-	# GODOT 4 API : safe & typed
 	var mat := sky.sky_material
 	if mat is ShaderMaterial:
 		sky_material = mat as ShaderMaterial
@@ -50,6 +51,7 @@ func _ready() -> void:
 
 	_create_sun()
 	_create_moon()
+	#_create_debug_lines()
 
 func _process(delta: float) -> void:
 	_update_time(delta)
@@ -65,9 +67,9 @@ func _update_celestials() -> void:
 	var angle_deg := time * 360.0 - 90.0
 
 	var sun_dir := Vector3(
-		0,
+		cos(deg_to_rad(angle_deg)),
 		sin(deg_to_rad(angle_deg)),
-		cos(deg_to_rad(angle_deg))
+		0,
 	)
 
 	var moon_dir := -sun_dir
@@ -82,6 +84,24 @@ func _update_celestials() -> void:
 
 	sun_light.visible = sun_dir.y > 0.0
 	moon_light.visible = moon_dir.y > 0.0
+
+	if debug_sun_line and debug_sun_line.mesh:
+		var sun_immediate := debug_sun_line.mesh as ImmediateMesh
+		sun_immediate.clear_surfaces()
+		sun_immediate.surface_begin(Mesh.PRIMITIVE_LINES)
+		sun_immediate.surface_set_color(Color(1, 1, 0))
+		sun_immediate.surface_add_vertex(sun_light.global_position)
+		sun_immediate.surface_add_vertex(grid_center)
+		sun_immediate.surface_end()
+
+	if debug_moon_line and debug_moon_line.mesh:
+		var moon_immediate := debug_moon_line.mesh as ImmediateMesh
+		moon_immediate.clear_surfaces()
+		moon_immediate.surface_begin(Mesh.PRIMITIVE_LINES)
+		moon_immediate.surface_set_color(Color(0.8, 0.8, 1))
+		moon_immediate.surface_add_vertex(moon_light.global_position)
+		moon_immediate.surface_add_vertex(grid_center)
+		moon_immediate.surface_end()
 
 func _update_environment() -> void:
 	var env := world_env.environment
@@ -145,3 +165,12 @@ func _create_moon() -> void:
 	moon_light.light_energy = 0.25
 	moon_light.shadow_enabled = true
 	add_child(moon_light)
+
+func _create_debug_lines() -> void:
+	debug_sun_line = MeshInstance3D.new()
+	debug_sun_line.mesh = ImmediateMesh.new()
+	add_child(debug_sun_line)
+
+	debug_moon_line = MeshInstance3D.new()
+	debug_moon_line.mesh = ImmediateMesh.new()
+	add_child(debug_moon_line)
