@@ -9,7 +9,7 @@ class_name DayNightCycle
 # 🎯 Centre de la grille (ex: axial_to_world(0,0))
 @export var grid_center: Vector3 = Vector3.ZERO
 
-@export var day_length_seconds := 120.0
+@export var day_length_seconds := 180.0
 
 # Astres
 const SUN_SIZE := 100.0
@@ -103,6 +103,8 @@ func _create_sun() -> void:
 	sun_light.name = "SunLight"
 	sun_light.light_energy = 2.5
 	sun_light.shadow_enabled = true
+	sun_light.shadow_blur = 5.0
+
 	sun_mesh.add_child(sun_light)
 
 	#sun_arrow = _create_arrow(Color(1.0, 0.8, 0.2))
@@ -127,6 +129,8 @@ func _create_moon() -> void:
 	moon_light.name = "MoonLight"
 	moon_light.light_energy = 0.5
 	moon_light.shadow_enabled = true
+	moon_light.shadow_blur = 5.0
+
 	moon_mesh.add_child(moon_light)
 
 	#moon_arrow = _create_arrow(Color(1.0, 1.0, 1.0, 1.0))

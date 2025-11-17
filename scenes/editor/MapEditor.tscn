@@ -25,6 +25,7 @@ script = ExtResource("10_sa2v6")
 sun_pivot = NodePath("SunPivot")
 moon_pivot = NodePath("MoonPivot")
 world_env = NodePath("../WorldEnvironment")
+day_length_seconds = 30.0
 
 [node name="SunPivot" type="Node3D" parent="DayNightCycle"]
 
