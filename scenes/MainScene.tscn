@@ -68,10 +68,31 @@ text = "New map"
 layout_mode = 2
 text = "Open map"
 
-[node name="OptionsButton" type="Button" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 32)
+[node name="OptionsFold" type="FoldableContainer" parent="VBoxContainer"]
 layout_mode = 2
-text = "Options"
+folded = true
+title = "Options"
+title_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/OptionsFold"]
+visible = false
+layout_mode = 2
+
+[node name="InputsButton" type="Button" parent="VBoxContainer/OptionsFold/VBoxContainer"]
+layout_mode = 2
+text = "Inputs"
+
+[node name="AudioButton" type="Button" parent="VBoxContainer/OptionsFold/VBoxContainer"]
+layout_mode = 2
+text = "Audio"
+
+[node name="VideoButton" type="Button" parent="VBoxContainer/OptionsFold/VBoxContainer"]
+layout_mode = 2
+text = "Video"
+
+[node name="GameButton" type="Button" parent="VBoxContainer/OptionsFold/VBoxContainer"]
+layout_mode = 2
+text = "Game"
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 32)
@@ -81,8 +102,9 @@ text = "Quitter"
 [node name="WindowNewMap" type="Window" parent="."]
 oversampling_override = 1.0
 title = "New map"
-position = Vector2i(0, 36)
+initial_position = 2
 size = Vector2i(320, 99)
+visible = false
 wrap_controls = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="WindowNewMap"]
@@ -133,8 +155,9 @@ text = "OK"
 [node name="WindowOpenMap" type="Window" parent="."]
 oversampling_override = 1.0
 title = "Open map"
-position = Vector2i(0, 36)
+initial_position = 2
 size = Vector2i(320, 124)
+visible = false
 wrap_controls = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="WindowOpenMap"]
@@ -165,8 +188,52 @@ text = "Cancel"
 layout_mode = 2
 text = "Open"
 
+[node name="WindowVideo" type="Window" parent="."]
+oversampling_override = 1.0
+title = "Video options"
+initial_position = 2
+size = Vector2i(320, 117)
+visible = false
+wrap_controls = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowVideo"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CheckFullscreen" type="CheckBox" parent="WindowVideo/VBoxContainer"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="CheckVSync" type="CheckBox" parent="WindowVideo/VBoxContainer"]
+layout_mode = 2
+text = "Vertical Sync"
+
+[node name="OptionResolution" type="OptionButton" parent="WindowVideo/VBoxContainer"]
+layout_mode = 2
+item_count = 1
+popup/item_0/id = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowVideo/VBoxContainer"]
+layout_mode = 2
+
+[node name="CancelButton" type="Button" parent="WindowVideo/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="ApplyButton" type="Button" parent="WindowVideo/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply"
+
 [connection signal="pressed" from="VBoxContainer/EditorFold/VBoxContainer/NewMapButton" to="." method="_on_new_map_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/EditorFold/VBoxContainer/OpenMapButton" to="." method="_on_open_map_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/OptionsFold/VBoxContainer/VideoButton" to="." method="_on_video_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
 [connection signal="close_requested" from="WindowNewMap" to="." method="_on_window_new_map_close_requested"]
 [connection signal="pressed" from="WindowNewMap/VBoxContainer/HBoxContainer2/CancelNewMapButton" to="." method="_on_window_new_map_close_requested"]
@@ -175,3 +242,6 @@ text = "Open"
 [connection signal="ready" from="WindowOpenMap" to="." method="_on_window_open_map_ready"]
 [connection signal="pressed" from="WindowOpenMap/VBoxContainer/HBoxContainer/CancelOpenMapButton" to="." method="_on_window_open_map_close_requested"]
 [connection signal="pressed" from="WindowOpenMap/VBoxContainer/HBoxContainer/DoOpenMapButton" to="." method="_on_do_open_map_button_pressed"]
+[connection signal="close_requested" from="WindowVideo" to="." method="_on_window_video_close_requested"]
+[connection signal="pressed" from="WindowVideo/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_window_video_close_requested"]
+[connection signal="pressed" from="WindowVideo/VBoxContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
