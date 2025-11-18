@@ -5,7 +5,7 @@ signal model_selected(path: String)
 
 @onready var grid: GridContainer = $Panel/Scroll/Grid
 
-const MODEL_ROOT: String = "res://addons/kaykit_medieval_hexagon_pack/Assets/gltf"
+const MODEL_ROOT: String = "res://assets/gltf"
 const PREVIEW_SIZE: Vector2 = Vector2(128, 64)
 
 var models: Array[String] = []
