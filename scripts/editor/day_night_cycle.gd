@@ -1,283 +1,175 @@
 extends Node3D
 class_name DayNightCycle
 
-# Pivots Soleil / Lune
 @export var sun_pivot: Node3D
 @export var moon_pivot: Node3D
 @export var world_env: WorldEnvironment
 
-# 🎯 Centre de la grille (ex: axial_to_world(0,0))
 @export var grid_center: Vector3 = Vector3.ZERO
+@export var day_length_seconds: float = 180.0
 
-@export var day_length_seconds := 180.0
+const ORBIT_RADIUS := 1000.0
 
-# Astres
-const SUN_SIZE := 100.0
-const MOON_SIZE := 10.0
-const ORBIT_RADIUS := 5000.0
-
-var time := 0.25
-
-# Soleil
-var sun_mesh: MeshInstance3D
+var time: float = 0.0 # 0 = minuit, 0.5 = midi
 var sun_light: DirectionalLight3D
-var sun_arrow: Node3D
-
-# Lune
-var moon_mesh: MeshInstance3D
 var moon_light: DirectionalLight3D
-var moon_arrow: Node3D
+var sky_material: ShaderMaterial
+var debug_sun_line: MeshInstance3D
+var debug_moon_line: MeshInstance3D
 
-
-# ======================================================
-# READY
-# ======================================================
 func _ready() -> void:
-	print("☀️ DayNightCycle Loaded")
+	print("🌍 DayNightCycle Initialized")
 
-	if sun_pivot == null:
-		sun_pivot = get_node("SunPivot")
-	if moon_pivot == null:
-		moon_pivot = get_node("MoonPivot")
+	if not world_env:
+		push_error("❌ DayNightCycle: world_env is not assigned!")
+		return
+
+	var new_env := load("res://default_env.tres") as Environment
+	if new_env:
+		world_env.environment = new_env
+	else:
+		push_error("❌ Impossible de charger default_env.tres")
+		return
+
+	var env: Environment = world_env.environment
+	if env == null:
+		push_error("❌ world_env.environment is NULL!")
+		return
+
+	var sky := env.sky
+	if sky == null:
+		push_warning("⚠️ Aucun Sky trouvé dans l'Environment.")
+		return
+
+	var mat := sky.sky_material
+	if mat is ShaderMaterial:
+		sky_material = mat as ShaderMaterial
+		print("☀️ Sky shader linked successfully.")
+	else:
+		push_warning("⚠️ Sky présent mais pas de ShaderMaterial assigné.")
 
 	_create_sun()
 	_create_moon()
+	#_create_debug_lines()
 
-
-# ======================================================
-# PROCESS
-# ======================================================
 func _process(delta: float) -> void:
+	_update_time(delta)
+	_update_celestials()
+	_update_environment()
+	_update_shader()
+	_update_ui()
+
+func _update_time(delta: float) -> void:
 	time = fmod(time + delta / day_length_seconds, 1.0)
 
-	var phi := (time - 0.25) * TAU
+func _update_celestials() -> void:
+	var angle_deg := time * 360.0 - 90.0
 
-	var sun_dir := Vector3(0, sin(phi), cos(phi)).normalized()
+	var sun_dir := Vector3(
+		cos(deg_to_rad(angle_deg)),
+		sin(deg_to_rad(angle_deg)),
+		0,
+	)
+
 	var moon_dir := -sun_dir
 
-	var sun_pos := sun_dir * ORBIT_RADIUS
-	var moon_pos := moon_dir * ORBIT_RADIUS
+	sun_pivot.global_position = sun_dir * ORBIT_RADIUS
+	sun_light.global_position = sun_pivot.global_position
+	sun_light.look_at(grid_center)
 
-	sun_pivot.global_position = sun_pos
-	moon_pivot.global_position = moon_pos
+	moon_pivot.global_position = moon_dir * ORBIT_RADIUS
+	moon_light.global_position = moon_pivot.global_position
+	moon_light.look_at(grid_center)
 
-	_update_light_and_arrow(sun_light, sun_arrow, sun_pos)
-	_update_light_and_arrow(moon_light, moon_arrow, moon_pos)
+	sun_light.visible = sun_dir.y > 0.0
+	moon_light.visible = moon_dir.y > 0.0
 
-	var sun_strength: float = clamp(sun_dir.y, 0.0, 1.0)
+	if debug_sun_line and debug_sun_line.mesh:
+		var sun_immediate := debug_sun_line.mesh as ImmediateMesh
+		sun_immediate.clear_surfaces()
+		sun_immediate.surface_begin(Mesh.PRIMITIVE_LINES)
+		sun_immediate.surface_set_color(Color(1, 1, 0))
+		sun_immediate.surface_add_vertex(sun_light.global_position)
+		sun_immediate.surface_add_vertex(grid_center)
+		sun_immediate.surface_end()
 
-	# Zelda-style atmosphere
-	_update_environment(sun_strength)
-	_update_sky(sun_strength)
-	_update_fog(sun_strength)
-	_update_dusk_color(sun_strength)
-	_update_bloom()
+	if debug_moon_line and debug_moon_line.mesh:
+		var moon_immediate := debug_moon_line.mesh as ImmediateMesh
+		moon_immediate.clear_surfaces()
+		moon_immediate.surface_begin(Mesh.PRIMITIVE_LINES)
+		moon_immediate.surface_set_color(Color(0.8, 0.8, 1))
+		moon_immediate.surface_add_vertex(moon_light.global_position)
+		moon_immediate.surface_add_vertex(grid_center)
+		moon_immediate.surface_end()
 
-
-# ======================================================
-# UPDATE LIGHTS + ARROWS
-# ======================================================
-func _update_light_and_arrow(_light: DirectionalLight3D, _arrow: Node3D, _pos: Vector3) -> void:
-	_light.global_position = _pos
-	_light.look_at(grid_center, Vector3.UP)
-
-	#var dir := -_light.global_transform.basis.z.normalized()
-	#_arrow.global_transform = Transform3D(Basis.looking_at(dir, Vector3.UP), _arrow.global_position)
-
-
-# ======================================================
-# CREATION : SOLEIL
-# ======================================================
-func _create_sun() -> void:
-	sun_mesh = MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = SUN_SIZE
-	sun_mesh.mesh = sphere
-
-	sun_mesh.material_override = _make_emissive(Color(1.2, 1.1, 0.6), 3.0)
-	sun_mesh.material_override.no_depth_test = true
-
-	sun_pivot.add_child(sun_mesh)
-
-	sun_light = DirectionalLight3D.new()
-	sun_light.name = "SunLight"
-	sun_light.light_energy = 2.5
-	sun_light.shadow_enabled = true
-	sun_light.shadow_blur = 5.0
-
-	sun_mesh.add_child(sun_light)
-
-	#sun_arrow = _create_arrow(Color(1.0, 0.8, 0.2))
-	#sun_mesh.add_child(sun_arrow)
-
-
-# ======================================================
-# CREATION : LUNE
-# ======================================================
-func _create_moon() -> void:
-	moon_mesh = MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = MOON_SIZE
-	moon_mesh.mesh = sphere
-
-	moon_mesh.material_override = _make_emissive(Color(0.7, 0.8, 1.0), 1.0)
-	moon_mesh.material_override.no_depth_test = true
-
-	moon_pivot.add_child(moon_mesh)
-
-	moon_light = DirectionalLight3D.new()
-	moon_light.name = "MoonLight"
-	moon_light.light_energy = 0.5
-	moon_light.shadow_enabled = true
-	moon_light.shadow_blur = 5.0
-
-	moon_mesh.add_child(moon_light)
-
-	#moon_arrow = _create_arrow(Color(1.0, 1.0, 1.0, 1.0))
-	#moon_mesh.add_child(moon_arrow)
-
-
-# ======================================================
-# ARROW CREATION
-# ======================================================
-func _create_arrow(color: Color) -> Node3D:
-	var root := Node3D.new()
-
-	var cyl := CylinderMesh.new()
-	cyl.height = 200.0
-	cyl.top_radius = 8.0
-	cyl.bottom_radius = 8.0
-
-	var body := MeshInstance3D.new()
-	body.mesh = cyl
-	body.material_override = _make_emissive(color, 1.2)
-	body.rotation_degrees = Vector3(-90, 0, 0)
-	body.position = Vector3(0, 0, -100)
-	root.add_child(body)
-
-	var cone := CylinderMesh.new()
-	cone.height = 80.0
-	cone.top_radius = 0.0
-	cone.bottom_radius = 20.0
-
-	var tip := MeshInstance3D.new()
-	tip.mesh = cone
-	tip.material_override = _make_emissive(color, 1.5)
-	tip.rotation_degrees = Vector3(-90, 0, 0)
-	tip.position = Vector3(0, 0, -200)
-	root.add_child(tip)
-
-	return root
-
-
-# ======================================================
-# MATERIAL UTIL
-# ======================================================
-func _make_emissive(c: Color, e: float) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
-	m.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
-	m.emission_enabled = true
-	m.emission = c
-	m.emission_energy_multiplier = e
-	return m
-
-
-# ======================================================
-# ENVIRONMENT (AMBIENT LIGHT)
-# ======================================================
-func _update_environment(strength: float) -> void:
-	if world_env == null: return
+func _update_environment() -> void:
 	var env := world_env.environment
-	if env == null: return
+	var day_light: float = clamp((sin(time * PI * 2.0) * 0.5 + 0.5), 0.0, 1.0)
 
-	env.ambient_light_energy = lerp(0.05, 0.25, strength)
-	env.ambient_light_color = Color(0.1, 0.12, 0.20).lerp(Color.WHITE, strength)
+	env.ambient_light_energy = lerp(0.05, 0.4, day_light)
+	env.ambient_light_color = Color(0.07, 0.08, 0.12).lerp(Color(1, 1, 1), day_light)
 
-
-# ======================================================
-# SKY ≈ BOTW Blue Sky Gradient
-# ======================================================
-func _update_sky(strength: float) -> void:
-	if world_env == null: return
-	var env := world_env.environment
-	if env == null: return
-
-	var sky := env.sky
-	if sky == null: return
-
-	var mat := sky.sky_material
-	if mat == null: return
-
-	if mat is ProceduralSkyMaterial:
-		var p := mat as ProceduralSkyMaterial
-		p.sky_top_color = Color(0.05, 0.06, 0.12).lerp(Color(0.4, 0.6, 1.0), strength)
-		p.sky_horizon_color = Color(0.1, 0.12, 0.20).lerp(Color(0.5, 0.7, 1.0), strength)
-		p.energy_multiplier = max(0.1, strength)
-
-
-# ======================================================
-# FOG DYNAMIQUE STYLE BOTW
-# ======================================================
-func _update_fog(strength: float) -> void:
-	var env := world_env.environment
-
-	# Activer le fog
 	env.fog_enabled = true
-	
-	# Fog "léger" = BOTW style
-	# Couleur du fog : bleu clair le jour, bleu foncé la nuit
-	env.fog_light_color = Color(0.08, 0.10, 0.16).lerp(Color(0.6, 0.7, 1.0), strength)
+	var fog_night := Color(0.07, 0.08, 0.12)
+	var fog_day := Color(0.55, 0.65, 0.85)
+	env.fog_light_color = fog_night.lerp(fog_day, day_light)
+	env.fog_light_energy = lerp(0.6, 0.05, day_light)
+	env.fog_density = lerp(0.025, 0.01, day_light)
 
-	# Force du fog
-	env.fog_light_energy = lerp(0.3, 1.4, strength)
+func _update_shader() -> void:
+	if not sky_material:
+		return
 
-	# Ajout d’un fog atmosphérique global
-	env.fog_density = lerp(0.015, 0.001, strength)
+	sky_material.set_shader_parameter("time_of_day", time)
+	sky_material.set_shader_parameter("sun_direction", -sun_light.global_transform.basis.z.normalized())
+	sky_material.set_shader_parameter("moon_direction", -moon_light.global_transform.basis.z.normalized())
 
-	# Influence du ciel sur le fog
-	env.fog_sky_affect = lerp(0.1, 0.6, strength)
+func _update_ui() -> void:
+	if Engine.is_editor_hint():
+		return
 
+	var moment_label := get_node_or_null("../UI/VBoxContainer/FoldableDayTime/VBoxContainer/HBoxContainerMoment/MomentValue") as Label
+	if moment_label:
+		moment_label.text = _get_day_phase()
 
-# ======================================================
-# COULEURS DU CREPUSCULE STYLE BOTW
-# ======================================================
-func _update_dusk_color(sun_strength: float) -> void:
-	var env := world_env.environment
-	if env == null: return
+	var time_label := get_node_or_null("../UI/VBoxContainer/FoldableDayTime/VBoxContainer/HBoxContainerTime/TimeValue") as Label
+	if time_label:
+		time_label.text = _format_time()
 
-	var sky := env.sky
-	if sky == null: return
-	var mat := sky.sky_material
-	if mat == null: return
-	if not (mat is ProceduralSkyMaterial): return
+func _get_day_phase() -> String:
+	var hour := time * 24.0
 
-	var p := mat as ProceduralSkyMaterial
+	if hour < 4.0: return "🌑 Nuit profonde"
+	if hour < 6.0: return "🌅 Aube"
+	if hour < 6.5: return "🌄 Lever du soleil"
+	if hour < 12.0: return "🌤 Matin"
+	if hour < 13.0: return "☀️ Midi"
+	if hour < 17.0: return "🌞 Après-midi"
+	if hour < 19.0: return "🌇 Déclin"
+	if hour < 20.0: return "🌆 Crépuscule"
+	return "🌌 Nuit"
 
-	# ----------------------------------------------------
-	# Crépuscule : moment où le soleil est proche de 0° 
-	# (sun_strength proche de 0 mais pas encore négatif)
-	# ----------------------------------------------------
+func _format_time() -> String:
+	var minutes := int(time * 1440.0)
+	return "%02d:%02d" % [minutes / 60, minutes % 60]
 
-	# dusk_factor = 1.0 lorsque sun_strength ≈ 0.15
-	# dusk_factor = 0.0 lorsque sun_strength = 0 ou 0.5
-	var dusk_factor: float = clamp(1.0 - abs(sun_strength - 0.15) * 6.0, 0.0, 1.0)
+func _create_sun() -> void:
+	sun_light = DirectionalLight3D.new()
+	sun_light.light_energy = 0.8
+	sun_light.shadow_enabled = true
+	add_child(sun_light)
 
-	# Couleurs orangées façon BOTW
-	var dusk_top := Color(0.9, 0.4, 0.2)
-	var dusk_horizon := Color(1.0, 0.55, 0.25)
+func _create_moon() -> void:
+	moon_light = DirectionalLight3D.new()
+	moon_light.light_energy = 0.25
+	moon_light.shadow_enabled = true
+	add_child(moon_light)
 
-	# Mélange sky normal → sky crépuscule
-	p.sky_top_color = p.sky_top_color.lerp(dusk_top, dusk_factor * 0.8)
-	p.sky_horizon_color = p.sky_horizon_color.lerp(dusk_horizon, dusk_factor)
+func _create_debug_lines() -> void:
+	debug_sun_line = MeshInstance3D.new()
+	debug_sun_line.mesh = ImmediateMesh.new()
+	add_child(debug_sun_line)
 
-	# Option : renforcer l’horizon en bas
-	p.ground_horizon_color = Color(0.8, 0.4, 0.3).lerp(Color(0.3, 0.3, 0.3), dusk_factor)
-
-
-# ======================================================
-# BLOOM / HALO ATMOSPHERIQUE
-# ======================================================
-func _update_bloom() -> void:
-	# Pas besoin de code : activer dans Project Settings:
-	# Rendering → Glow → Enabled
-	pass
+	debug_moon_line = MeshInstance3D.new()
+	debug_moon_line.mesh = ImmediateMesh.new()
+	add_child(debug_moon_line)
