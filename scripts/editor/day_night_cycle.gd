@@ -46,7 +46,7 @@ func _process(delta: float) -> void:
 	_update_environment()
 	_update_ui()
 
-func _update_time(delta: float) -> void:
+func _update_time(_delta: float) -> void:
 	time = animation_player.current_animation_position / day_length_seconds
 
 func _update_celestials() -> void:
@@ -114,7 +114,7 @@ func _update_ui() -> void:
 func _get_day_phase() -> String:
 	var time_ratio = animation_player.current_animation_position / day_length_seconds
 	var minutes = int(time_ratio * day_length_seconds)
-	var hours : float = minutes / 60
+	var hours : float = float(minutes) / 60
 
 	if hours < 5.0: return "🌑 Nuit profonde"
 	if hours < 6.0: return "🌅 Aube"
@@ -129,7 +129,9 @@ func _get_day_phase() -> String:
 func _format_time() -> String:
 	var time_ratio = animation_player.current_animation_position / day_length_seconds
 	var minutes = int(time_ratio * day_length_seconds)
-	return "%02d:%02d" % [minutes / 60, fmod(minutes, 60)]
+	var hours : float = float(minutes) / 60
+
+	return "%02d:%02d" % [hours, fmod(minutes, 60)]
 
 func _create_moon() -> void:
 	moon_light = DirectionalLight3D.new()
@@ -150,4 +152,3 @@ func _create_debug_lines() -> void:
 func _on_speed_value_value_changed(value: float) -> void:
 	time_speed = value
 	animation_player.speed_scale = time_speed
-	animation_player.play("DayNightCycle")

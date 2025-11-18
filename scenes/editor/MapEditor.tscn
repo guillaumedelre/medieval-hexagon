@@ -55,8 +55,8 @@ shader_parameter/cloud_curves = SubResource("CurveTexture_3qj4f")
 shader_parameter/clouds_samples = 32
 shader_parameter/shadow_sample = 4
 shader_parameter/clouds_density = 0.40000000596048
-shader_parameter/clouds_scale = 1.0000000074506001
-shader_parameter/clouds_smoothness = 0.049999998882400004
+shader_parameter/clouds_scale = 1.0000000074506
+shader_parameter/clouds_smoothness = 0.0499999988824
 shader_parameter/clouds_light_color = Color(0.22745098, 0.44705883, 1, 1)
 shader_parameter/clouds_shadow_intensity = 8.0000001192096
 shader_parameter/high_clouds_sampler = SubResource("NoiseTexture2D_vwj3y")
@@ -355,6 +355,7 @@ shadow_enabled = true
 [node name="MoonPivot" type="Node3D" parent="DayNightCycle"]
 
 [node name="MoonMesh" type="MeshInstance3D" parent="DayNightCycle/MoonPivot"]
+visible = false
 mesh = SubResource("QuadMesh_lp20a")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="DayNightCycle"]
