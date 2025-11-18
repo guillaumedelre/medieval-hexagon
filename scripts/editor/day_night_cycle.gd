@@ -8,6 +8,7 @@ class_name DayNightCycle
 @export var grid_center: Vector3 = Vector3.ZERO
 @export var day_length_seconds: float = 180.0
 
+
 const ORBIT_RADIUS := 1000.0
 
 var time: float = 0.0 # 0 = minuit, 0.5 = midi
