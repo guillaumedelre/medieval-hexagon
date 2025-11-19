@@ -231,8 +231,86 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Apply"
 
+[node name="WindowAudio" type="Window" parent="."]
+oversampling_override = 1.0
+title = "Audio options"
+initial_position = 2
+size = Vector2i(320, 122)
+visible = false
+wrap_controls = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowAudio"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainerMaster" type="HBoxContainer" parent="WindowAudio/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="WindowAudio/VBoxContainer/HBoxContainerMaster"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Master"
+
+[node name="MasterSlider" type="HSlider" parent="WindowAudio/VBoxContainer/HBoxContainerMaster"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="HBoxContainerMusic" type="HBoxContainer" parent="WindowAudio/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="WindowAudio/VBoxContainer/HBoxContainerMusic"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="WindowAudio/VBoxContainer/HBoxContainerMusic"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="HBoxContainerEffects" type="HBoxContainer" parent="WindowAudio/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="WindowAudio/VBoxContainer/HBoxContainerEffects"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Effects"
+
+[node name="EffectsSlider" type="HSlider" parent="WindowAudio/VBoxContainer/HBoxContainerEffects"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="CheckMute" type="CheckBox" parent="WindowAudio/VBoxContainer"]
+layout_mode = 2
+text = "Mute all sounds"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowAudio/VBoxContainer"]
+layout_mode = 2
+
+[node name="CancelButton" type="Button" parent="WindowAudio/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="ApplyButton" type="Button" parent="WindowAudio/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply"
+
 [connection signal="pressed" from="VBoxContainer/EditorFold/VBoxContainer/NewMapButton" to="." method="_on_new_map_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/EditorFold/VBoxContainer/OpenMapButton" to="." method="_on_open_map_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/OptionsFold/VBoxContainer/AudioButton" to="." method="_on_audio_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/OptionsFold/VBoxContainer/VideoButton" to="." method="_on_video_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
 [connection signal="close_requested" from="WindowNewMap" to="." method="_on_window_new_map_close_requested"]
@@ -245,3 +323,6 @@ text = "Apply"
 [connection signal="close_requested" from="WindowVideo" to="." method="_on_window_video_close_requested"]
 [connection signal="pressed" from="WindowVideo/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_window_video_close_requested"]
 [connection signal="pressed" from="WindowVideo/VBoxContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
+[connection signal="close_requested" from="WindowAudio" to="." method="_on_window_audio_close_requested"]
+[connection signal="pressed" from="WindowAudio/VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_window_audio_close_requested"]
+[connection signal="pressed" from="WindowAudio/VBoxContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_audio_pressed"]

@@ -3,6 +3,10 @@ extends Control
 @onready var chk_fullscreen: CheckBox = $WindowVideo/VBoxContainer/CheckFullscreen
 @onready var chk_vsync: CheckBox = $WindowVideo/VBoxContainer/CheckVSync
 @onready var opt_resolution: OptionButton = $WindowVideo/VBoxContainer/OptionResolution
+@onready var chk_mute: CheckBox = $WindowAudio/VBoxContainer/CheckMute
+@onready var slider_master: HSlider = $WindowAudio/VBoxContainer/HBoxContainerMaster/MasterSlider
+@onready var slider_music: HSlider = $WindowAudio/VBoxContainer/HBoxContainerMusic/MusicSlider
+@onready var slider_effects: HSlider = $WindowAudio/VBoxContainer/HBoxContainerEffects/EffectsSlider
 
 const CONFIG_PATH := "user://settings.cfg"
 
@@ -27,7 +31,7 @@ func _load_settings() -> void:
 	var err := cfg.load(CONFIG_PATH)
 
 	if err != OK:
-		print("No existing settings. Applying defaults.")
+		DialogUtils.warning(get_tree().current_scene, "No existing settings. Applying defaults.")
 		return
 
 	if cfg.has_section_key("video", "fullscreen"):
@@ -41,6 +45,18 @@ func _load_settings() -> void:
 		if idx >= 0 and idx < available_resolutions.size():
 			opt_resolution.selected = idx
 
+	if cfg.has_section_key("audio", "mute"):
+		chk_mute.button_pressed = cfg.get_value("audio", "mute")
+
+	if cfg.has_section_key("audio", "master"):
+		slider_master.value = cfg.get_value("audio", "master")
+
+	if cfg.has_section_key("audio", "music"):
+		slider_music.value = cfg.get_value("audio", "music")
+
+	if cfg.has_section_key("audio", "effects"):
+		slider_effects.value = cfg.get_value("audio", "effects")
+
 
 func _save_settings() -> void:
 	var cfg := ConfigFile.new()
@@ -48,6 +64,11 @@ func _save_settings() -> void:
 	cfg.set_value("video", "fullscreen", chk_fullscreen.button_pressed)
 	cfg.set_value("video", "vsync", chk_vsync.button_pressed)
 	cfg.set_value("video", "resolution", opt_resolution.selected)
+
+	cfg.set_value("audio", "mute", chk_mute.button_pressed)
+	cfg.set_value("audio", "master", slider_master.value)
+	cfg.set_value("audio", "music", slider_music.value)
+	cfg.set_value("audio", "effects", slider_effects.value)
 
 	cfg.save(CONFIG_PATH)
 
@@ -198,11 +219,40 @@ func _on_video_button_pressed() -> void:
 
 
 func _on_apply_button_pressed() -> void:
-	if chk_fullscreen.button_pressed:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	else:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if chk_fullscreen.button_pressed else DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if chk_vsync.button_pressed else DisplayServer.VSYNC_DISABLED)
 	DisplayServer.window_set_size(available_resolutions[opt_resolution.selected])
 	_save_settings()
 	$WindowVideo.hide()
+
+func _on_audio_button_pressed() -> void:
+	$WindowAudio.popup_centered()
+
+
+func _on_window_audio_close_requested() -> void:
+	$WindowAudio.hide()
+
+
+func _on_apply_audio_pressed() -> void:
+	if chk_mute.button_pressed:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
+	else:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), false)
+
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(slider_master.value))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(slider_music.value))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Effects"), linear_to_db(slider_effects.value))
+
+	_save_settings()
+	$WindowAudio.hide()
+
+func _on_master_slider_value_changed(value: float) -> void:
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(value))
+
+
+func _on_music_slider_value_changed(value: float) -> void:
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(value))
+
+
+func _on_effects_slider_value_changed(value: float) -> void:
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Effects"), linear_to_db(value))
