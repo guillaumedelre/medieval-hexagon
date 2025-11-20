@@ -25,6 +25,7 @@ func _ready() -> void:
 	$WindowVideo.hide()
 	_load_resolutions()
 	_load_settings()
+	PlaylistManager._play_index(0)
 
 func _load_settings() -> void:
 	var cfg := ConfigFile.new()
@@ -234,11 +235,7 @@ func _on_window_audio_close_requested() -> void:
 
 
 func _on_apply_audio_pressed() -> void:
-	if chk_mute.button_pressed:
-		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
-	else:
-		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), false)
-
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true if chk_mute.button_pressed else false)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(slider_master.value))
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(slider_music.value))
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Effects"), linear_to_db(slider_effects.value))
@@ -256,3 +253,7 @@ func _on_music_slider_value_changed(value: float) -> void:
 
 func _on_effects_slider_value_changed(value: float) -> void:
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Effects"), linear_to_db(value))
+
+
+func _on_check_mute_toggled(toggled_on: bool) -> void:
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), toggled_on)
