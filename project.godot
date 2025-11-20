@@ -14,11 +14,16 @@ config/name="Medieval Hexagon"
 run/main_scene="uid://s7pmrrfyckou"
 config/features=PackedStringArray("4.5")
 
+[audio]
+
+buses/default_bus_layout="uid://b3i8xerjldl44"
+
 [autoload]
 
 FileManager="*res://scripts/utils/file_manager.gd"
 DialogUtils="*res://scripts/utils/dialog_utils.gd"
 HexMath="*res://scripts/utils/hex_math.gd"
+PlaylistManager="*res://scripts/utils/playlist_manager.gd"
 
 [display]
 
